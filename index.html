@@ -8,9 +8,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
-    /* 全局背景和容器 */
+    /* 全局背景和容器 - 采用更鲜艳的渐变色 */
     .main-container {
-      background: linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%);
+      background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -26,7 +26,7 @@
       width: 100%;
       max-width: 60rem;
     }
-    /* 功能卡片样式 */
+    /* 功能卡片样式 - 增加发光效果 */
     .feature-card {
       background: #ffffff;
       border-radius: 1.5rem;
@@ -40,16 +40,48 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
+      position: relative; /* 为伪元素定位提供基准 */
+      overflow: hidden; /* 隐藏超出边界的伪元素 */
     }
+    
+    /* 伪元素用于创建渐变发光边框效果 */
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 1.5rem;
+        background: linear-gradient(45deg, #ff7e5f, #feb47b, #86a8e7, #5345b5);
+        opacity: 0;
+        transform: scale(0.98);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        z-index: -1; /* 确保伪元素在卡片主体后面 */
+    }
+
     .feature-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
     }
+    
+    .feature-card:hover::before {
+        opacity: 1;
+        transform: scale(1);
+    }
+
     .feature-card-icon {
       width: 4rem;
       height: 4rem;
       margin-bottom: 1.5rem;
-      color: #3b82f6;
+      color: #5345b5;
+      transition: color 0.3s ease;
+    }
+    .feature-card-icon svg {
+        transition: transform 0.3s ease;
+    }
+    .feature-card:hover .feature-card-icon svg {
+        transform: scale(1.1) rotate(5deg);
     }
     .feature-card-title {
       font-size: 1.5rem;
@@ -61,19 +93,22 @@
       color: #6b7280;
       margin-top: 0.5rem;
     }
+    /* 按钮样式 - 采用渐变背景 */
     .enter-btn {
       margin-top: 1.5rem;
       padding: 0.75rem 2.5rem;
       border-radius: 9999px;
       font-weight: 600;
-      background-color: #3b82f6;
       color: #ffffff;
-      transition: background-color 0.3s ease;
+      background-image: linear-gradient(45deg, #a8c0ff 0%, #3f2b96 100%);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
     .enter-btn:hover {
-      background-color: #2563eb;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
-    /* 模态窗口样式 */
+    /* 模态窗口样式 - 保持简洁 */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -99,7 +134,7 @@
       border-radius: 1.5rem;
       padding: 3rem;
       width: 95%;
-      max-width: 60rem; /* 增加模态窗口最大宽度 */
+      max-width: 60rem;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       position: relative;
       transform: scale(0.95);
@@ -134,19 +169,20 @@
     }
     .form-input:focus, .form-textarea:focus, .form-select:focus {
       outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+      border-color: #5345b5;
+      box-shadow: 0 0 0 3px rgba(83, 69, 181, 0.5);
     }
     .submit-btn {
-      background-color: #2563eb;
+      background-image: linear-gradient(45deg, #a8c0ff 0%, #3f2b96 100%);
       color: #ffffff;
       padding: 0.75rem 1.5rem;
       border-radius: 0.75rem;
       font-weight: 600;
-      transition: background-color 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .submit-btn:hover {
-      background-color: #1e40af;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     /* Toast 通知 */
     .toast {
@@ -155,7 +191,7 @@
       right: 1.5rem;
       padding: 1rem;
       border-radius: 0.75rem;
-      background-color: #1f2937;
+      background-color: #3f2b96;
       color: #ffffff;
       opacity: 0;
       visibility: hidden;
@@ -193,8 +229,8 @@
   <div class="main-container">
     <div class="main-content">
       <header class="text-center mb-12">
-        <h1 class="text-5xl font-extrabold text-gray-900 leading-tight drop-shadow-lg">公开赛审核平台</h1>
-        <p class="text-gray-600 mt-4 text-xl">提交你的题目，让更多人挑战</p>
+        <h1 class="text-5xl font-extrabold text-white leading-tight drop-shadow-lg">公开赛审核平台</h1>
+        <p class="text-indigo-200 mt-4 text-xl">提交你的题目，让更多人挑战</p>
       </header>
 
       <!-- 功能选择卡片区域 -->
@@ -243,12 +279,6 @@
     // 定义后端 API URL
     const WORKER_URL = 'https://hackerapi.mr-onion-blog.fun';
     
-    // ⚠️重要：如果希望开启开发者工具检测并强制刷新，请将此变量设置为 true
-    // 如果设置为 false，则只提示，不刷新
-    const shouldRefreshOnDevTools = true;
-    let devtoolsOpen = false;
-    let devtoolsDetectionTimer;
-
     /**
      * 封装的后端 API 调用函数，处理请求头和错误
      * @param {string} endpoint - API 路径
@@ -320,6 +350,7 @@
           }
 
         } catch (error) {
+          // 捕获网络错误，并返回一个失败响应
           console.error('API call failed:', error);
           return { success: false, message: '网络请求失败，请稍后重试' };
         }
@@ -426,6 +457,32 @@
         }
       }
     }
+
+    // ======================================
+    // 快捷键事件监听
+    // ======================================
+    document.addEventListener('keydown', (e) => {
+      // 禁用 F12
+      if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault();
+        showToast('F12 已被禁用。');
+      }
+      // 禁用 Ctrl+Shift+I
+      if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) {
+        e.preventDefault();
+        showToast('Ctrl+Shift+I 已被禁用。');
+      }
+      // 启用 Ctrl+Shift+L 进入管理员登录
+      if (e.ctrlKey && e.shiftKey && (e.key === 'L' || e.key === 'l')) {
+        e.preventDefault();
+        showToast('已启用管理员登录快捷键');
+        showModal('admin-login-form');
+      }
+      // 禁用右键菜单
+      document.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+      });
+    });
     
     // ======================================
     // HTML 生成函数
@@ -756,74 +813,10 @@
         }
     }
 
-    // ==========================================================
-    // 新的开发者工具检测逻辑（基于console.log性能差异）
-    // ==========================================================
-    const devtoolsCheck = () => {
-        const threshold = 100; // 阈值，单位：毫秒。这个值可能需要根据环境调整
-        const start = performance.now();
-        // 循环执行多次console.log，以放大时间差异
-        for (let i = 0; i < 50; i++) {
-            console.log(i);
-            console.clear(); // 清空控制台，防止日志堆积
-        }
-        const end = performance.now();
-        const duration = end - start;
-
-        // 如果执行时间超过阈值，则认为DevTools已打开
-        if (duration > threshold) {
-            if (!devtoolsOpen) {
-                devtoolsOpen = true;
-                if (shouldRefreshOnDevTools) {
-                    showToast('警告: 检测到开发者工具已打开！页面将反复刷新。');
-                    devtoolsDetectionTimer = setInterval(() => {
-                        location.reload();
-                    }, 500);
-                } else {
-                    showToast('警告: 检测到开发者工具已打开！');
-                }
-                debugger; // 触发debugger，立即暂停
-            }
-        } else {
-            if (devtoolsOpen) {
-                devtoolsOpen = false;
-                showToast('开发者工具已关闭。');
-                clearInterval(devtoolsDetectionTimer);
-            }
-        }
-    };
-    
-    // 每秒检查一次，这个频率是可接受的，且不会影响正常性能
-    setInterval(devtoolsCheck, 1000);
-
-    // 禁用 F12, Ctrl+Shift+I
-    document.addEventListener('keydown', (e) => {
-      // 禁用 F12
-      if (e.key === 'F12' || e.keyCode === 123) {
-        e.preventDefault();
-        showToast('F12 已被禁用。');
-      }
-      // 禁用 Ctrl+Shift+I
-      if (e.ctrlKey && e.shiftKey && e.key === 'I') {
-        e.preventDefault();
-        showToast('Ctrl+Shift+I 已被禁用。');
-      }
-      // Ctrl+Shift+L 进入管理员登录
-      if (e.ctrlKey && e.shiftKey && e.key === 'L') {
-        e.preventDefault();
-        showModal('admin-login-form');
-      }
-    });
-
-    // 禁用右键菜单
-    document.addEventListener('contextmenu', e => {
-      e.preventDefault();
-      showToast('右键菜单已被禁用。');
-    });
-
     // 页面加载时执行
     window.onload = checkAdminStatusOnLoad;
   </script>
 </body>
 </html>
+
 
