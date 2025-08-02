@@ -246,6 +246,8 @@
     // ⚠️重要：如果希望开启开发者工具检测并强制刷新，请将此变量设置为 true
     // 如果设置为 false，则只提示，不刷新
     const shouldRefreshOnDevTools = true;
+    let devtoolsOpen = false;
+    let devtoolsDetectionTimer;
 
     /**
      * 封装的后端 API 调用函数，处理请求头和错误
@@ -755,31 +757,21 @@
     }
 
     // ==========================================================
-    // 修复后的开发者工具检测逻辑
+    // 新的开发者工具检测逻辑（基于console.log性能差异）
     // ==========================================================
-    let devtoolsOpen = false;
-    let devtoolsDetectionTimer;
     const devtoolsCheck = () => {
-        // 使用一个简单的函数来检测，减少误报
-        const check = () => {
-            // 通过检查函数字符串表示的长度来检测，当DevTools打开时，
-            // toString()的输出可能被修改，导致长度变化
-            const f = () => {};
-            if (f.toString().length !== 22) {
-                return true;
-            }
-            // 尝试触发debugger，并检查是否暂停
-            const d = new Date();
-            debugger; // This line will pause execution in DevTools
-            const diff = new Date() - d;
-            // 如果时间差非常大，则很可能处于调试状态
-            if (diff > 500) { 
-                return true;
-            }
-            return false;
-        };
+        const threshold = 100; // 阈值，单位：毫秒。这个值可能需要根据环境调整
+        const start = performance.now();
+        // 循环执行多次console.log，以放大时间差异
+        for (let i = 0; i < 50; i++) {
+            console.log(i);
+            console.clear(); // 清空控制台，防止日志堆积
+        }
+        const end = performance.now();
+        const duration = end - start;
 
-        if (check()) {
+        // 如果执行时间超过阈值，则认为DevTools已打开
+        if (duration > threshold) {
             if (!devtoolsOpen) {
                 devtoolsOpen = true;
                 if (shouldRefreshOnDevTools) {
@@ -790,6 +782,7 @@
                 } else {
                     showToast('警告: 检测到开发者工具已打开！');
                 }
+                debugger; // 触发debugger，立即暂停
             }
         } else {
             if (devtoolsOpen) {
@@ -800,7 +793,7 @@
         }
     };
     
-    // 每秒检查一次
+    // 每秒检查一次，这个频率是可接受的，且不会影响正常性能
     setInterval(devtoolsCheck, 1000);
 
     // 禁用 F12, Ctrl+Shift+I
@@ -833,3 +826,4 @@
   </script>
 </body>
 </html>
+
