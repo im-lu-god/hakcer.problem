@@ -508,7 +508,7 @@
       const emailError = document.getElementById('email-error');
       const fileInput = form.querySelector('[name="problemFile"]');
       const fileError = document.getElementById('file-error');
-      const FILE_SIZE_LIMIT = 10 * 1024; // 10KB
+      const FILE_SIZE_LIMIT = 1024 * 1024; // 1MB
       const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
       emailInput.addEventListener('input', () => {
