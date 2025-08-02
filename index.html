@@ -4,82 +4,88 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>公开赛审核平台</title>
+  <!-- 引入 Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
+    body { font-family: 'Inter', sans-serif; }
+    /* 全局背景和容器 */
     .main-container {
-      background-color: #f3f4f6;
+      background: linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%);
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      padding: 1.5rem;
     }
-    .card {
-      background-color: #ffffff;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      border-radius: 1rem;
-      width: 100%;
-      max-width: 42rem;
-      padding: 2rem;
+    .main-content {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      align-items: center;
+      gap: 2rem;
+      width: 100%;
+      max-width: 60rem;
     }
-    .toast {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      z-index: 50;
-      padding: 1rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      background-color: #1f2937;
-      color: #ffffff;
-      transition: opacity 0.3s ease-in-out;
-      opacity: 0;
-      pointer-events: none;
+    /* 功能卡片样式 */
+    .feature-card {
+      background: #ffffff;
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      width: 100%;
+      max-width: 20rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
-    .toast.visible {
-      opacity: 1;
-      pointer-events: auto;
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
     }
-    .nav-btn {
-      padding: 0.5rem 1rem;
+    .feature-card-icon {
+      width: 4rem;
+      height: 4rem;
+      margin-bottom: 1.5rem;
+      color: #3b82f6;
+    }
+    .feature-card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+    .feature-card-description {
+      font-size: 1rem;
+      color: #6b7280;
+      margin-top: 0.5rem;
+    }
+    .enter-btn {
+      margin-top: 1.5rem;
+      padding: 0.75rem 2.5rem;
       border-radius: 9999px;
-      transition-property: background-color, color, box-shadow;
-      transition-duration: 300ms;
-      font-weight: 500;
-      color: #4b5563;
-      background-color: #e5e7eb;
+      font-weight: 600;
+      background-color: #3b82f6;
+      color: #ffffff;
+      transition: background-color 0.3s ease;
     }
-    .nav-btn:hover {
-      background-color: #d1d5db;
-    }
-    .nav-btn.active-blue {
+    .enter-btn:hover {
       background-color: #2563eb;
-      color: #ffffff;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
-    .nav-btn.active-purple {
-      background-color: #6d28d9;
-      color: #ffffff;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    /* 模态框样式 */
+    /* 模态窗口样式 */
     .modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
+      background-color: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 100;
+      z-index: 50;
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -90,636 +96,691 @@
     }
     .modal-content {
       background-color: #ffffff;
-      border-radius: 1rem;
-      padding: 2rem;
-      width: 90%;
-      max-width: 60rem;
-      max-height: 90vh;
-      overflow-y: auto;
+      border-radius: 1.5rem;
+      padding: 3rem;
+      width: 95%;
+      max-width: 60rem; /* 增加模态窗口最大宽度 */
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
       transform: scale(0.95);
       transition: transform 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
     }
     .modal-overlay.visible .modal-content {
       transform: scale(1);
     }
-    .markdown-body {
-        line-height: 1.6;
-        word-wrap: break-word;
+    .modal-close-btn {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: #6b7280;
+      transition: color 0.3s ease;
     }
-    .markdown-body h1, .markdown-body h2, .markdown-body h3 {
-        font-weight: bold;
-        margin-top: 1em;
-        margin-bottom: 0.5em;
+    .modal-close-btn:hover {
+      color: #1f2937;
     }
-    .markdown-body h1 { font-size: 1.5em; }
-    .markdown-body h2 { font-size: 1.25em; }
-    .markdown-body h3 { font-size: 1.1em; }
-    .markdown-body p {
-        margin-bottom: 1em;
+    /* 表单样式 */
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid #d1d5db;
+      background-color: #f9fafb;
+      transition: all 0.2s ease;
     }
-    .markdown-body ul, .markdown-body ol {
-        padding-left: 2em;
-        margin-bottom: 1em;
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
     }
-    .markdown-body pre {
-        background-color: #f6f8fa;
-        border-radius: 6px;
-        padding: 16px;
-        overflow: auto;
-        line-height: 1.45;
+    .submit-btn {
+      background-color: #2563eb;
+      color: #ffffff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
     }
-    .markdown-body code {
-        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-        background-color: #f6f8fa;
-        border-radius: 6px;
-        padding: 0.2em 0.4em;
+    .submit-btn:hover {
+      background-color: #1e40af;
     }
-    .markdown-body pre > code {
-        background-color: transparent;
-        padding: 0;
+    /* Toast 通知 */
+    .toast {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      background-color: #1f2937;
+      color: #ffffff;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      transform: translateY(-20px);
+      z-index: 60;
+    }
+    .toast.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    /* 表格样式 */
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .admin-table th, .admin-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .admin-table th {
+      background-color: #f3f4f6;
+      font-weight: 600;
+      color: #374151;
+    }
+    .admin-table tbody tr:last-child td {
+      border-bottom: none;
     }
   </style>
 </head>
-<body>
+<body class="bg-gray-100">
 
-<div class="main-container">
-  <div class="card">
-    <header class="text-center">
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-800">公开赛审核平台</h1>
-      <p class="text-gray-500 mt-2">请选择你要进行的操作</p>
-    </header>
+  <div class="main-container">
+    <div class="main-content">
+      <header class="text-center mb-12">
+        <h1 class="text-5xl font-extrabold text-gray-900 leading-tight drop-shadow-lg">公开赛审核平台</h1>
+        <p class="text-gray-600 mt-4 text-xl">提交你的题目，让更多人挑战</p>
+      </header>
 
-    <nav class="flex justify-center space-x-4 md:space-x-8">
-      <button id="nav-problem" class="nav-btn">题目提交</button>
-      <button id="nav-status" class="nav-btn">状态查询</button>
-      <button id="nav-admin" class="nav-btn hidden">管理面板</button>
-    </nav>
+      <!-- 功能选择卡片区域 -->
+      <div class="flex flex-col md:flex-row flex-wrap justify-center gap-8 w-full">
+        <!-- 题目提交卡片 -->
+        <div id="card-submit" class="feature-card">
+          <svg class="feature-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <h2 class="feature-card-title">题目提交</h2>
+          <p class="feature-card-description">提交你原创的题目，等待审核。</p>
+          <button class="enter-btn" onclick="showModal('problem-submission-form')">进入</button>
+        </div>
 
-    <main id="main-content" class="mt-6 p-4 border rounded-xl bg-gray-50">
-      <!-- 页面内容将在这里动态加载 -->
-      <div id="home-page" class="text-center p-8 text-gray-500">
-        <p>欢迎使用公开赛审核平台。请从上方导航栏选择一个功能。</p>
-      </div>
+        <!-- 状态查询卡片 -->
+        <div id="card-status" class="feature-card">
+          <svg class="feature-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-8.08"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <h2 class="feature-card-title">状态查询</h2>
+          <p class="feature-card-description">查询已提交题目的审核进度。</p>
+          <button class="enter-btn" onclick="showModal('status-query-form')">进入</button>
+        </div>
 
-      <!-- 题目提交表单 -->
-      <div id="problem-submission-form" class="space-y-4 hidden">
-        <h2 class="text-2xl font-semibold text-gray-700">题目提交</h2>
-        <form id="problem-form" class="space-y-4">
-          <div>
-            <label for="oj-nickname" class="block text-sm font-medium text-gray-700">OJ昵称</label>
-            <input id="oj-nickname" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
-          </div>
-          <div>
-            <label for="user-uid" class="block text-sm font-medium text-gray-700">UID</label>
-            <input id="user-uid" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
-          </div>
-          <div>
-            <label for="user-email" class="block text-sm font-medium text-gray-700">邮箱</label>
-            <input id="user-email" type="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
-            <p id="email-error" class="mt-1 text-sm text-red-500 hidden">请输入正确的邮箱格式。</p>
-          </div>
-          <div>
-            <label for="user-awards" class="block text-sm font-medium text-gray-700">获奖经历 (可选)</label>
-            <textarea id="user-awards" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors"></textarea>
-          </div>
-          <div>
-            <label for="problem-title" class="block text-sm font-medium text-gray-700">题目标题</label>
-            <input id="problem-title" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
-          </div>
-          <div>
-            <label for="problem-difficulty" class="block text-sm font-medium text-gray-700">难度</label>
-            <select id="problem-difficulty" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
-              <option value="">请选择难度...</option>
-              <option value="入门">入门</option>
-              <option value="普及-">普及-</option>
-              <option value="普及/提高-">普及/提高-</option>
-              <option value="普及+/提高">普及+/提高</option>
-              <option value="提高+/省选">提高+/省选</option>
-              <option value="省选/NOI-">省选/NOI-</option>
-              <option value="NOI/NOI+/CTSC">NOI/NOI+/CTSC</option>
-            </select>
-          </div>
-          <div>
-            <label for="problem-description" class="block text-sm font-medium text-gray-700">题目描述</label>
-            <textarea id="problem-description" rows="6" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required></textarea>
-          </div>
-          <div>
-            <label for="problem-zip" class="block text-sm font-medium text-gray-700">题目文件 (.zip, 不超过10KB)</label>
-            <input id="problem-zip" type="file" accept=".zip" class="mt-1 block w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors" required>
-            <p id="file-error" class="mt-1 text-sm text-red-500 hidden">文件大小不能超过10KB。</p>
-          </div>
-          <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-700 transition-colors shadow-lg">提交题目</button>
-        </form>
-      </div>
-
-      <div id="status-query-form" class="space-y-4 hidden">
-        <h2 class="text-2xl font-semibold text-gray-700">状态查询</h2>
-        <form id="status-form" class="space-y-4">
-          <div>
-            <label for="query-id" class="block text-sm font-medium text-gray-700">申请ID</label>
-            <input id="query-id" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
-          </div>
-          <button type="submit" class="w-full bg-green-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-green-700 transition-colors shadow-lg">查询状态</button>
-        </form>
-      </div>
-
-      <div id="submission-result" class="hidden">
-        <!-- 提交结果或查询结果将在这里动态显示 -->
-      </div>
-      
-      <div id="admin-login-form" class="space-y-4 hidden">
-        <h2 class="text-2xl font-semibold text-gray-700">管理员登录</h2>
-        <form id="admin-login" class="space-y-4">
-          <div>
-            <label for="admin-password" class="block text-sm font-medium text-gray-700">密码</label>
-            <input id="admin-password" type="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
-          </div>
-          <button type="submit" class="w-full bg-purple-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-purple-700 transition-colors shadow-lg">登录</button>
-        </form>
-      </div>
-
-      <div id="admin-dashboard" class="space-y-4 hidden">
-        <h2 class="text-2xl font-semibold text-gray-700 flex justify-between items-center">
-          所有申请列表
-          <button id="admin-logout-btn" class="px-4 py-2 text-sm rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors font-medium">退出登录</button>
-        </h2>
-        <div id="applications-list" class="divide-y divide-gray-200">
-          <!-- 申请列表将在这里加载 -->
+        <!-- 管理员面板卡片 (默认隐藏) -->
+        <div id="card-admin-panel" class="feature-card" style="display: none;">
+          <svg class="feature-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
+          <h2 class="feature-card-title">管理员面板</h2>
+          <p class="feature-card-description">管理和审核所有题目申请。</p>
+          <button class="enter-btn" onclick="showAdminPanel()">进入</button>
         </div>
       </div>
-    </main>
-  </div>
-</div>
-
-<div id="toast" class="toast"></div>
-
-<!-- 题目详情模态框 -->
-<div id="application-details-modal" class="modal-overlay">
-  <div class="modal-content">
-    <div class="flex justify-between items-center">
-      <h3 class="text-2xl font-bold text-gray-800">题目详情</h3>
-      <button id="close-modal-btn" class="text-gray-500 hover:text-gray-700">&times;</button>
-    </div>
-    <div id="details-content" class="mt-4 space-y-4">
-      <!-- 题目详情将在这里加载 -->
     </div>
   </div>
-</div>
 
-<script>
-  // 模拟的后端URL，请在部署到Cloudflare Worker后修改此URL
-  const BACKEND_URL = 'https://hackerapi.mr-onion-blog.fun/api';
-  
-  // ==================== 反调试功能控制标志 ====================
-  // 如果设置为 true，在检测到开发者工具打开时，页面将反复刷新
-  const shouldRefreshOnDevTools = false; 
-  // ================================================================
+  <!-- 模态窗口容器 -->
+  <div id="main-modal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+      <div id="modal-body">
+        <!-- 动态内容将加载到此处 -->
+      </div>
+    </div>
+  </div>
 
-  // Email regex for validation
-  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  // File size limit in bytes (10KB)
-  const FILE_SIZE_LIMIT = 10 * 1024;
+  <!-- Toast 通知容器 -->
+  <div id="toast" class="toast"></div>
 
-  const mainContent = document.getElementById('main-content');
-  const toastElement = document.getElementById('toast');
-  const navButtons = document.querySelectorAll('nav button');
-  const emailInput = document.getElementById('user-email');
-  const emailError = document.getElementById('email-error');
-  const fileInput = document.getElementById('problem-zip');
-  const fileError = document.getElementById('file-error');
-
-  const detailsModal = document.getElementById('application-details-modal');
-  const detailsContent = document.getElementById('details-content');
-
-  let currentView = 'home';
-  let isAdminAuthenticated = false;
-
-  // 辅助函数：显示Toast提示
-  function showToast(message) {
-    toastElement.textContent = message;
-    toastElement.classList.add('visible');
-    setTimeout(() => {
-      toastElement.classList.remove('visible');
-    }, 3000);
-  }
-
-  // 辅助函数：切换视图
-  function navigateTo(viewId) {
-    // 隐藏所有内容
-    document.querySelectorAll('#main-content > div').forEach(div => div.classList.add('hidden'));
+  <script>
+    // 定义后端 API URL
+    const WORKER_URL = 'https://hackerapi.mr-onion-blog.fun';
     
-    // 显示目标内容
-    document.getElementById(viewId).classList.remove('hidden');
-    currentView = viewId;
+    // ⚠️重要：如果希望开启开发者工具检测并强制刷新，请将此变量设置为 true
+    // 如果设置为 false，则只提示，不刷新
+    const shouldRefreshOnDevTools = true;
 
-    // 更新导航按钮状态
-    navButtons.forEach(btn => {
-      btn.classList.remove('active-blue', 'active-purple');
-      if (
-        (viewId === 'problem-submission-form' && btn.id === 'nav-problem') ||
-        (viewId === 'status-query-form' && btn.id === 'nav-status') ||
-        (viewId === 'admin-dashboard' && btn.id === 'nav-admin')
-      ) {
-        btn.classList.add(btn.id === 'nav-admin' ? 'active-purple' : 'active-blue');
-      }
-    });
-  }
+    /**
+     * 封装的后端 API 调用函数，处理请求头和错误
+     * @param {string} endpoint - API 路径
+     * @param {object} options - Fetch API 的选项
+     * @returns {Promise<object>} - API 响应的 JSON 数据
+     */
+    const callBackendApi = async (endpoint, options = {}) => {
+        const defaultHeaders = {
+            'Content-Type': 'application/json'
+        };
+        // 如果存在管理员 token，则添加到请求头中
+        const adminToken = localStorage.getItem('adminToken');
+        if (adminToken) {
+            defaultHeaders['Authorization'] = `Bearer ${adminToken}`;
+        }
+        const headers = { ...defaultHeaders, ...options.headers };
+        try {
+          const response = await fetch(`${WORKER_URL}${endpoint}`, {
+              ...options,
+              headers,
+          });
 
-  // 辅助函数：简单的 Markdown 渲染
-  function renderMarkdown(markdown) {
-    // 处理代码块
-    const codeBlockRegex = /```(\w+)?\n([\s\S]+?)\n```/g;
-    let html = markdown.replace(codeBlockRegex, (match, p1, p2) => {
-      return `<pre><code>${p2.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
-    });
+          // 如果响应不成功，尝试将其作为文本处理
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API call failed with status:', response.status, 'Error:', errorText);
 
-    // 处理行内代码
-    const inlineCodeRegex = /`([^`]+)`/g;
-    html = html.replace(inlineCodeRegex, '<code>$1</code>');
+            // 如果是 401 Unauthorized 错误，清除本地存储的token并强制重新登录
+            if (response.status === 401) {
+              localStorage.removeItem('adminToken');
+              hideAdminPanelCard();
+              showToast('会话过期，请重新登录。');
+              // 这里返回一个明确的失败对象，让调用者可以处理
+              return { success: false, message: '会话过期，请重新登录。' };
+            }
 
-    // 处理粗体
-    const boldRegex = /\*\*(.*?)\*\*|__(.*?)__/g;
-    html = html.replace(boldRegex, '<strong>$1$2</strong>');
+            return { success: false, message: errorText || `API call failed with status: ${response.status}` };
+          }
+          
+          // 检查 Content-Type，确保我们只在是JSON时才调用 .json()
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.indexOf('application/json') !== -1) {
+            const data = await response.json();
+            // 根据后端返回的数据结构，返回一个统一的对象
+            if (data.token) {
+              return { success: true, token: data.token };
+            }
+            if (data.id) {
+              return { success: true, id: data.id };
+            }
+            // 检查是否是单个申请对象，或者是一个数组（管理员面板）
+            if (Array.isArray(data)) {
+              return { success: true, data: data };
+            }
+            // 假设单个申请对象也包含 status 字段
+            if (data.status) {
+              return { success: true, data: data };
+            }
+            // 处理 token 验证成功的响应
+            if (data.message === 'Token is valid') {
+              return { success: true, message: data.message };
+            }
+            return { success: true, message: '请求成功，但返回数据结构未知。' };
 
-    // 处理斜体
-    const italicRegex = /\*(.*?)\*|_(.*?)_/g;
-    html = html.replace(italicRegex, '<em>$1$2</em>');
+          } else {
+            // 处理非 JSON 的成功响应（例如纯文本消息）
+            const textData = await response.text();
+            return { success: true, message: textData };
+          }
 
-    // 处理标题
-    html = html.replace(/^###\s(.*$)/gim, '<h3>$1</h3>');
-    html = html.replace(/^##\s(.*$)/gim, '<h2>$1</h2>');
-    html = html.replace(/^#\s(.*$)/gim, '<h1>$1</h1>');
-    
-    // 处理无序列表
-    html = html.replace(/^\s*[-*]\s(.*$)/gim, '<li>$1</li>');
-    html = `<ul>${html}</ul>`;
-
-    // 处理段落和换行
-    html = html.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
-
-    return `<div class="markdown-body"><p>${html}</p></div>`;
-  }
-
-  // 辅助函数：渲染提交结果
-  function renderSubmissionResult(status, id, data) {
-    const resultDiv = document.getElementById('submission-result');
-    let content = '';
-
-    if (status === 'success') {
-      content = `
-        <div class="text-center p-8">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <h2 class="text-xl font-bold mt-4 text-gray-800">申请提交成功！</h2>
-          <p class="mt-2 text-gray-600">你的申请ID是：<code class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md font-mono">${id}</code></p>
-          <p class="text-gray-500">请妥善保存此ID，以便后续查询状态。</p>
-        </div>
-      `;
-    } else if (status === 'error') {
-      content = `
-        <div class="text-center p-8">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <h2 class="text-xl font-bold mt-4 text-gray-800">提交失败</h2>
-          <p class="mt-2 text-gray-600">请检查你的网络或稍后重试。</p>
-        </div>
-      `;
-    } else if (status === 'query-success') {
-      content = `
-        <div class="p-8 space-y-4">
-          <h2 class="text-2xl font-bold text-gray-800">申请状态查询结果</h2>
-          <p class="text-gray-600">申请ID: <code class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md font-mono">${data.id}</code></p>
-          <div class="p-4 rounded-lg bg-white border">
-            <p class="font-semibold text-gray-700">状态: <span class="font-bold text-lg text-blue-600">${data.status}</span></p>
-            <p class="mt-2 text-sm text-gray-500">题目提交</p>
-            ${data.email ? `<p class="mt-1 text-sm text-gray-500">邮箱: ${data.email}</p>` : ''}
-            ${data.ojNickname ? `<p class="mt-1 text-sm text-gray-500">OJ昵称: ${data.ojNickname}</p>` : ''}
-            ${data.uid ? `<p class="mt-1 text-sm text-gray-500">UID: ${data.uid}</p>` : ''}
-            ${data.awards ? `<p>获奖经历: ${data.awards}</p>` : ''}
-            ${data.problemTitle ? `<p class="mt-1 text-sm text-gray-500">题目标题: ${data.problemTitle}</p>` : ''}
-            ${data.difficulty ? `<p>难度: ${data.difficulty}</p>` : ''}
-          </div>
-        </div>
-      `;
-    } else if (status === 'query-error') {
-      content = `
-        <div class="text-center p-8">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <h2 class="text-xl font-bold mt-4 text-gray-800">查询失败</h2>
-          <p class="mt-2 text-gray-600">找不到该申请ID，请检查后重试。</p>
-        </div>
-      `;
-    }
-    resultDiv.innerHTML = content;
-    resultDiv.classList.remove('hidden');
-  }
-
-  // 事件监听器
-  document.getElementById('nav-problem').addEventListener('click', () => navigateTo('problem-submission-form'));
-  document.getElementById('nav-status').addEventListener('click', () => navigateTo('status-query-form'));
-  document.getElementById('nav-admin').addEventListener('click', () => fetchAdminApplications());
-
-  // 题目提交表单提交事件
-  document.getElementById('problem-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    // 验证邮箱格式
-    if (!EMAIL_REGEX.test(document.getElementById('user-email').value)) {
-      document.getElementById('email-error').classList.remove('hidden');
-      showToast('请输入正确的邮箱格式。');
-      return;
-    } else {
-      document.getElementById('email-error').classList.add('hidden');
-    }
-
-    const file = document.getElementById('problem-zip').files[0];
-    if (!file) {
-      showToast('请选择一个 .zip 文件。');
-      return;
-    }
-
-    // 检查文件大小
-    if (file.size > FILE_SIZE_LIMIT) {
-      document.getElementById('file-error').classList.remove('hidden');
-      showToast('文件大小超过10KB限制。');
-      return;
-    } else {
-      document.getElementById('file-error').classList.add('hidden');
-    }
-
-    // 使用 FileReader 读取文件并进行 Base64 编码
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const base64Content = e.target.result.split(',')[1];
-      const payload = {
-        ojNickname: document.getElementById('oj-nickname').value,
-        uid: document.getElementById('user-uid').value,
-        email: document.getElementById('user-email').value,
-        awards: document.getElementById('user-awards').value,
-        problemTitle: document.getElementById('problem-title').value,
-        difficulty: document.getElementById('problem-difficulty').value,
-        problemDescription: document.getElementById('problem-description').value,
-        problemFile: base64Content,
-      };
-
-      try {
-        const response = await fetch(`${BACKEND_URL}/submit-problem`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || '提交失败');
-        renderSubmissionResult('success', result.id);
-        navigateTo('submission-result');
-      } catch (error) {
-        console.error('提交错误:', error);
-        showToast('提交失败，请检查网络或后端配置。');
-        renderSubmissionResult('error');
-        navigateTo('submission-result');
-      }
+        } catch (error) {
+          console.error('API call failed:', error);
+          return { success: false, message: '网络请求失败，请稍后重试' };
+        }
     };
-    reader.readAsDataURL(file);
-  });
 
-  document.getElementById('status-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id = document.getElementById('query-id').value;
+    // ======================================
+    // UI 控制和事件处理
+    // ======================================
+    const modal = document.getElementById('main-modal');
+    const modalBody = document.getElementById('modal-body');
+    const toast = document.getElementById('toast');
+    let currentView = null; // 用于跟踪当前模态窗口中显示的视图
     
-    try {
-      const response = await fetch(`${BACKEND_URL}/status/${id}`);
-      if (!response.ok) throw new Error('查询失败，申请ID不存在');
-      const data = await response.json();
-      renderSubmissionResult('query-success', id, data);
-      navigateTo('submission-result');
-    } catch (error) {
-      console.error('查询错误:', error);
-      renderSubmissionResult('query-error');
-      navigateTo('submission-result');
+    // 显示模态窗口
+    function showModal(viewId) {
+      modal.classList.add('visible');
+      renderView(viewId);
     }
-  });
-  
-  document.getElementById('admin-login').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const password = document.getElementById('admin-password').value;
-    
-    try {
-      const response = await fetch(`${BACKEND_URL}/admin/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error('登录失败');
-      localStorage.setItem('sessionKey', result.sessionKey);
-      isAdminAuthenticated = true;
-      document.getElementById('nav-admin').classList.remove('hidden');
-      showToast('管理员登录成功！');
-      fetchAdminApplications();
-    } catch (error) {
-      console.error('登录错误:', error);
-      showToast('登录失败，请检查密码。');
-      navigateTo('admin-login-form');
-    }
-  });
 
-  document.getElementById('admin-logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('sessionKey');
-    isAdminAuthenticated = false;
-    document.getElementById('nav-admin').classList.add('hidden');
-    showToast('已退出管理员账号。');
-    navigateTo('home-page');
-  });
-  
-  // 管理员仪表盘：获取并渲染申请列表
-  async function fetchAdminApplications() {
-    const sessionKey = localStorage.getItem('sessionKey');
-    if (!sessionKey) {
-      showToast('请先登录管理员账号。');
-      navigateTo('admin-login-form');
-      return;
+    // 关闭模态窗口
+    function closeModal() {
+      modal.classList.remove('visible');
+      modalBody.innerHTML = '';
+      currentView = null;
     }
     
-    navigateTo('admin-dashboard');
-    const applicationsList = document.getElementById('applications-list');
-    applicationsList.innerHTML = '<div class="text-center p-8 text-gray-500">加载中...</div>';
+    // 渲染指定视图
+    function renderView(viewId) {
+      modalBody.innerHTML = ''; // 清空内容
+      currentView = viewId;
+      switch (viewId) {
+        case 'problem-submission-form':
+          modalBody.innerHTML = generateProblemSubmissionForm();
+          setupProblemSubmissionForm();
+          break;
+        case 'status-query-form':
+          modalBody.innerHTML = generateStatusQueryForm();
+          setupStatusQueryForm();
+          break;
+        case 'admin-login-form':
+          modalBody.innerHTML = generateAdminLoginForm();
+          setupAdminLoginForm();
+          break;
+        case 'admin-panel':
+          modalBody.innerHTML = generateAdminPanelUI();
+          setupAdminPanel();
+          break;
+        default:
+          modalBody.innerHTML = `<p class="text-center text-gray-500">视图不存在</p>`;
+          break;
+      }
+    }
 
-    try {
-      const response = await fetch(`${BACKEND_URL}/admin/applications`, {
-        headers: {
-          'Authorization': `Bearer ${sessionKey}`,
-        },
-      });
+    // 显示 Toast 消息
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('visible');
+      setTimeout(() => {
+        toast.classList.remove('visible');
+      }, 3000);
+    }
 
-      if (!response.ok) {
-        localStorage.removeItem('sessionKey');
-        isAdminAuthenticated = false;
-        showToast('认证信息已过期，请重新登录。');
-        navigateTo('admin-login-form');
+    // 显示管理员面板卡片
+    function showAdminPanelCard() {
+      const adminPanelCard = document.getElementById('card-admin-panel');
+      if (adminPanelCard) {
+        adminPanelCard.style.display = 'flex';
+      }
+    }
+
+    // 隐藏管理员面板卡片
+    function hideAdminPanelCard() {
+      const adminPanelCard = document.getElementById('card-admin-panel');
+      if (adminPanelCard) {
+        adminPanelCard.style.display = 'none';
+      }
+    }
+    
+    // 管理员面板的入口函数
+    function showAdminPanel() {
+      const adminToken = localStorage.getItem('adminToken');
+      if (!adminToken) {
+        showToast('请先登录管理员账户');
+        showModal('admin-login-form');
         return;
       }
-
-      const applications = await response.json();
-      if (applications.length === 0) {
-        applicationsList.innerHTML = '<div class="text-center p-8 text-gray-500">目前没有待处理的申请。</div>';
-      } else {
-        applicationsList.innerHTML = applications.map(app => `
-          <div class="py-4 flex justify-between items-center">
-            <div>
-              <p class="font-medium text-gray-800">
-                题目提交
-                <span class="ml-2 text-sm text-gray-500">ID: ${app.id}</span>
-              </p>
-              <p class="text-sm text-gray-600">状态: <span class="font-semibold">${app.status}</span></p>
-              <p class="text-sm text-gray-500">题目: ${app.problemTitle}</p>
-            </div>
-            <button class="view-details-btn px-4 py-2 text-sm rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors font-medium" data-id="${app.id}">查看详情</button>
-          </div>
-        `).join('');
-        
-        // 为每个详情按钮添加事件监听器
-        document.querySelectorAll('.view-details-btn').forEach(button => {
-          button.addEventListener('click', (e) => {
-            const id = e.target.dataset.id;
-            fetchApplicationDetails(id);
-          });
-        });
-      }
-    } catch (err) {
-      applicationsList.innerHTML = `<div class="text-center p-8 text-red-500">错误: ${err.message}</div>`;
+      
+      showModal('admin-panel');
     }
-  }
 
-  // 获取并显示题目详情
-  async function fetchApplicationDetails(id) {
-    const sessionKey = localStorage.getItem('sessionKey');
-    if (!sessionKey) {
-      showToast('请先登录。');
-      navigateTo('admin-login-form');
-      return;
+    // 页面加载时检查管理员登录状态 (改进)
+    async function checkAdminStatusOnLoad() {
+      const adminToken = localStorage.getItem('adminToken');
+      if (adminToken) {
+        // 增加一个 API 调用来验证 token 是否有效
+        const result = await callBackendApi('/api/admin/verify-token');
+        if (result.success) {
+          showAdminPanelCard();
+        } else {
+          // Token 无效，清除本地存储并隐藏管理员卡片
+          localStorage.removeItem('adminToken');
+          hideAdminPanelCard();
+          showToast('管理员会话已过期，请重新登录。');
+        }
+      }
     }
     
-    detailsContent.innerHTML = '<div class="text-center text-gray-500">加载中...</div>';
-    detailsModal.classList.add('visible');
-
-    try {
-      const response = await fetch(`${BACKEND_URL}/admin/application/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${sessionKey}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('无法获取题目详情');
-      }
-
-      const application = await response.json();
-      
-      let rejectionReasonHtml = '';
-      if (application.rejectionReason) {
-        rejectionReasonHtml = `<p class="text-red-500 font-semibold">打回理由: ${application.rejectionReason}</p>`;
-      }
-
-      detailsContent.innerHTML = `
-        <div>
-          <p class="text-sm text-gray-500">ID: ${application.id}</p>
-          <p class="text-sm text-gray-500">状态: <span class="font-bold text-lg text-blue-600">${application.status}</span></p>
-          ${rejectionReasonHtml}
-          <p class="text-sm text-gray-500">提交者: ${application.ojNickname} (UID: ${application.uid})</p>
-          <p class="text-sm text-gray-500">邮箱: ${application.email}</p>
-          ${application.awards ? `<p class="text-sm text-gray-500">获奖经历: ${application.awards}</p>` : ''}
-          <p class="text-sm text-gray-500">题目标题: ${application.problemTitle}</p>
-          <p class="text-sm text-gray-500">难度: ${application.difficulty}</p>
-        </div>
-        <div class="mt-4">
-          <h4 class="text-lg font-semibold">题目描述</h4>
-          <div class="border p-4 rounded-lg bg-gray-50 overflow-y-auto max-h-[30vh]">
-            ${renderMarkdown(application.problemDescription)}
+    // ======================================
+    // HTML 生成函数
+    // ======================================
+    function generateProblemSubmissionForm() {
+      return `
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">题目提交</h2>
+        <form id="problem-submission-form" class="space-y-4">
+          <div><label class="block text-sm font-medium text-gray-700">OJ昵称</label><input type="text" name="ojNickname" class="form-input mt-1" required></div>
+          <div><label class="block text-sm font-medium text-gray-700">UID</label><input type="text" name="uid" class="form-input mt-1" required></div>
+          <div><label class="block text-sm font-medium text-gray-700">邮箱</label><input type="email" name="email" class="form-input mt-1" required><p id="email-error" class="mt-1 text-sm text-red-500 hidden">请输入正确的邮箱格式。</p></div>
+          <div><label class="block text-sm font-medium text-gray-700">获奖经历 (可选)</label><textarea name="awards" rows="3" class="form-textarea mt-1"></textarea></div>
+          <div><label class="block text-sm font-medium text-gray-700">题目标题</label><input type="text" name="problemTitle" class="form-input mt-1" required></div>
+          <div><label class="block text-sm font-medium text-gray-700">难度</label><select name="difficulty" class="form-select mt-1" required>
+            <option value="">请选择难度...</option><option value="入门">入门</option><option value="普及-">普及-</option><option value="普及/提高-">普及/提高-</option><option value="普及+/提高">普及+/提高</option><option value="提高+/省选">提高+/省选</option><option value="省选/NOI-">省选/NOI-</option><option value="NOI/NOI+/CTSC">NOI/NOI+/CTSC</option>
+          </select></div>
+          <div><label class="block text-sm font-medium text-gray-700">题目描述 (Markdown)</label><textarea name="problemDescription" rows="6" class="form-textarea mt-1" required></textarea></div>
+          <div><label class="block text-sm font-medium text-gray-700">题目文件 (.zip, 不超过10KB)</label><input type="file" name="problemFile" accept=".zip" class="mt-1 block w-full text-gray-700" required>
+            <p id="file-error" class="mt-1 text-sm text-red-500 hidden">文件大小不能超过10KB。</p>
           </div>
-        </div>
-        <div class="mt-4">
-          <button id="download-zip-btn" data-base64="${application.problemFile}" data-filename="${application.problemTitle || 'problem'}-${application.id}.zip" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors">下载题目文件 (.zip)</button>
-        </div>
-        ${application.status === '待审核' ? `
-        <div class="mt-4 flex flex-col space-y-2">
-          <textarea id="rejection-reason" class="w-full rounded-md border-gray-300 shadow-sm" placeholder="请输入打回理由 (可选)"></textarea>
-          <div class="flex space-x-2">
-            <button id="approve-btn" data-id="${application.id}" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">通过</button>
-            <button id="reject-btn" data-id="${application.id}" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">打回</button>
-          </div>
-        </div>
-        ` : ''}
+          <button type="submit" class="w-full submit-btn">提交题目</button>
+        </form>
       `;
-
-      // 添加下载按钮的事件监听器
-      const downloadBtn = document.getElementById('download-zip-btn');
-      if (downloadBtn) {
-        downloadBtn.addEventListener('click', () => {
-          const base64Data = downloadBtn.dataset.base64;
-          const filename = downloadBtn.dataset.filename;
-          const link = document.createElement('a');
-          link.href = `data:application/zip;base64,${base64Data}`;
-          link.download = filename;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          showToast('文件下载中...');
-        });
-      }
-
-      // 添加审核按钮的事件监听器
-      const approveBtn = document.getElementById('approve-btn');
-      const rejectBtn = document.getElementById('reject-btn');
-      if (approveBtn) {
-        approveBtn.addEventListener('click', () => updateApplicationStatus(approveBtn.dataset.id, '已通过'));
-      }
-      if (rejectBtn) {
-        rejectBtn.addEventListener('click', () => {
-          const reason = document.getElementById('rejection-reason').value;
-          updateApplicationStatus(rejectBtn.dataset.id, '已打回', reason);
-        });
-      }
-
-    } catch (error) {
-      detailsContent.innerHTML = `<div class="text-center text-red-500">错误: ${error.message}</div>`;
     }
-  }
 
-  // 关闭模态框
-  document.getElementById('close-modal-btn').addEventListener('click', () => {
-    detailsModal.classList.remove('visible');
-  });
+    function generateStatusQueryForm() {
+      return `
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">状态查询</h2>
+        <form id="status-query-form" class="space-y-4">
+          <div><label class="block text-sm font-medium text-gray-700">申请ID</label><input type="text" name="queryId" class="form-input mt-1" required></div>
+          <button type="submit" class="w-full submit-btn bg-green-600 hover:bg-green-700">查询状态</button>
+        </form>
+        <div id="status-result" class="mt-6 p-4 border rounded-lg bg-gray-50 hidden"></div>
+      `;
+    }
 
-  // 更新申请状态
-  async function updateApplicationStatus(id, status, reason = '') {
-    const sessionKey = localStorage.getItem('sessionKey');
-    try {
-      const response = await fetch(`${BACKEND_URL}/admin/application/update-status`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${sessionKey}`,
-        },
-        body: JSON.stringify({ id, status, reason }),
+    function generateAdminLoginForm() {
+      return `
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">管理员登录</h2>
+        <form id="admin-login-form" class="space-y-4">
+          <div><label class="block text-sm font-medium text-gray-700">密码</label><input type="password" name="password" class="form-input mt-1" required></div>
+          <button type="submit" class="w-full submit-btn bg-purple-600 hover:bg-purple-700">登录</button>
+        </form>
+      `;
+    }
+
+    function generateAdminPanelUI() {
+        return `
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">管理员面板</h2>
+            <div id="admin-applications-list" class="w-full">
+                <!-- 申请列表将动态加载到这里 -->
+                <p class="text-center text-gray-500">加载中...</p>
+            </div>
+        `;
+    }
+
+    function generateReasonModal(action, id) {
+        const actionText = action === 'approve' ? '通过' : '拒绝';
+        const placeholderText = action === 'approve' ? '请填写通过的理由或建议...' : '请填写拒绝的理由和建议...';
+        return `
+            <h2 class="text-3xl font-bold mb-6 text-gray-800">${actionText}申请</h2>
+            <p class="text-gray-600 mb-4">申请ID: ${id}</p>
+            <form id="reason-form">
+                <div>
+                    <label for="reason-textarea" class="block text-sm font-medium text-gray-700 mb-2">理由/建议</label>
+                    <textarea id="reason-textarea" rows="6" class="form-textarea" placeholder="${placeholderText}" required></textarea>
+                </div>
+                <div class="flex justify-end gap-4 mt-6">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-lg text-gray-600 bg-gray-200 hover:bg-gray-300 transition-colors">取消</button>
+                    <button type="submit" class="px-4 py-2 rounded-lg text-white ${action === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} transition-colors">确认${actionText}</button>
+                </div>
+            </form>
+        `;
+    }
+    
+    // ======================================
+    // 视图初始化和事件绑定
+    // ======================================
+    function setupProblemSubmissionForm() {
+      const form = document.getElementById('problem-submission-form');
+      const emailInput = form.querySelector('[name="email"]');
+      const emailError = document.getElementById('email-error');
+      const fileInput = form.querySelector('[name="problemFile"]');
+      const fileError = document.getElementById('file-error');
+      const FILE_SIZE_LIMIT = 10 * 1024; // 10KB
+      const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      emailInput.addEventListener('input', () => {
+        if (!EMAIL_REGEX.test(emailInput.value)) {
+          emailError.classList.remove('hidden');
+        } else {
+          emailError.classList.add('hidden');
+        }
       });
-      if (!response.ok) {
-        throw new Error('更新状态失败');
-      }
-      showToast(`申请 ${id} 已${status}`);
-      detailsModal.classList.remove('visible');
-      fetchAdminApplications(); // 重新加载列表
-    } catch (error) {
-      showToast(`更新状态失败: ${error.message}`);
-    }
-  }
+      
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0 && fileInput.files[0].size > FILE_SIZE_LIMIT) {
+          fileError.classList.remove('hidden');
+        } else {
+          fileError.classList.add('hidden');
+        }
+      });
 
-  // 页面加载时的初始化
-  document.addEventListener('DOMContentLoaded', () => {
-    // 反调试功能：检测开发者工具是否打开
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (emailError.classList.contains('hidden') && fileError.classList.contains('hidden')) {
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData.entries());
+          
+          // 处理文件，将其转换为Base64
+          if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+              data.problemFile = event.target.result; // Base64字符串
+              // 提交数据
+              const result = await callBackendApi('/api/submit', { method: 'POST', body: JSON.stringify(data) });
+              if (result.success) {
+                showToast(`提交成功！申请ID: ${result.id}`);
+                closeModal();
+              } else {
+                showToast(result.message || '提交失败');
+              }
+            };
+            reader.readAsDataURL(file);
+          } else {
+            showToast('请上传题目文件');
+          }
+        }
+      });
+    }
+
+    function setupStatusQueryForm() {
+      const form = document.getElementById('status-query-form');
+      const statusResultDiv = document.getElementById('status-result');
+      
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const queryId = e.target.querySelector('[name="queryId"]').value;
+        const result = await callBackendApi(`/api/status/${queryId}`);
+
+        statusResultDiv.classList.remove('hidden');
+        if (result.success) {
+          const app = result.data;
+          let reasonHtml = '';
+          if (app.status !== '待审核' && app.reviewReason) {
+            reasonHtml = `<p class="mt-2 text-sm text-gray-500">审核理由: ${app.reviewReason}</p>`;
+          }
+
+          statusResultDiv.innerHTML = `
+            <p class="font-semibold text-lg text-gray-700">状态: <span class="font-bold text-blue-600">${app.status}</span></p>
+            <p class="mt-2 text-sm text-gray-500">OJ昵称: ${app.ojNickname}</p>
+            <p class="mt-1 text-sm text-gray-500">题目标题: ${app.problemTitle}</p>
+            <p class="mt-1 text-sm text-gray-500">难度: ${app.difficulty}</p>
+            ${reasonHtml}
+          `;
+          showToast('查询成功！');
+        } else {
+          statusResultDiv.innerHTML = `
+            <p class="text-center text-red-500">查询失败: ${result.message || '找不到该申请ID'}</p>
+          `;
+          showToast('查询失败。');
+        }
+      });
+    }
+
+    function setupAdminLoginForm() {
+      const form = document.getElementById('admin-login-form');
+      
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const password = e.target.querySelector('[name="password"]').value;
+        const result = await callBackendApi('/api/admin/login', { method: 'POST', body: JSON.stringify({ password }) });
+        
+        if (result.success) {
+          localStorage.setItem('adminToken', result.token); // 登录成功后保存token到本地存储
+          showToast('管理员登录成功！');
+          showAdminPanelCard();
+          closeModal();
+        } else {
+          showToast('登录失败: ' + (result.message || '密码错误'));
+        }
+      });
+    }
+
+    async function setupAdminPanel() {
+      const applicationsListDiv = document.getElementById('admin-applications-list');
+      applicationsListDiv.innerHTML = '<p class="text-center text-gray-500">加载中...</p>';
+      
+      const result = await callBackendApi('/api/admin/applications');
+
+      if (result.success && Array.isArray(result.data)) {
+        if (result.data.length === 0) {
+            applicationsListDiv.innerHTML = '<p class="text-center text-gray-500">目前没有待处理的申请。</p>';
+        } else {
+            let tableHtml = `
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>IP地址</th>
+                    <th>OJ昵称</th>
+                    <th>题目标题</th>
+                    <th>难度</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+            `;
+            result.data.forEach(app => {
+                tableHtml += `
+                  <tr data-id="${app.id}">
+                    <td><span title="${app.id}">${app.id.slice(0, 8)}...</span></td>
+                    <td>${app.ipAddress || '未知'}</td>
+                    <td>${app.ojNickname}</td>
+                    <td>${app.problemTitle}</td>
+                    <td>${app.difficulty}</td>
+                    <td>${app.status}</td>
+                    <td>
+                      <div class="flex gap-2 flex-wrap">
+                        <button onclick="showActionReasonModal('${app.id}', 'approve')" class="approve-btn text-white bg-green-500 hover:bg-green-600 px-3 py-1 rounded-full text-sm">通过</button>
+                        <button onclick="showActionReasonModal('${app.id}', 'reject')" class="reject-btn text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full text-sm">拒绝</button>
+                        <button onclick="downloadFile(this, 'description')" class="download-desc-btn text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-full text-sm">下载描述</button>
+                        <button onclick="downloadFile(this, 'file')" class="download-file-btn text-white bg-indigo-500 hover:bg-indigo-600 px-3 py-1 rounded-full text-sm">下载文件</button>
+                      </div>
+                    </td>
+                  </tr>
+                `;
+            });
+            tableHtml += `</tbody></table>`;
+            applicationsListDiv.innerHTML = tableHtml;
+        }
+      } else {
+        applicationsListDiv.innerHTML = `<p class="text-center text-red-500">加载失败: ${result.message || '无法获取申请列表。'}</p>`;
+      }
+    }
+
+    // 显示审核理由模态窗口
+    function showActionReasonModal(id, action) {
+        modal.classList.add('visible');
+        modalBody.innerHTML = generateReasonModal(action, id);
+        
+        const form = document.getElementById('reason-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const reason = document.getElementById('reason-textarea').value;
+            confirmAdminAction(id, action, reason);
+        });
+    }
+
+    // 提交审核操作
+    async function confirmAdminAction(id, action, reason) {
+        const url = `/api/admin/${action}/${id}`;
+        const result = await callBackendApi(url, { 
+            method: 'POST', 
+            body: JSON.stringify({ reason }) 
+        });
+        
+        if (result.success) {
+            showToast(`申请 ${id.slice(0, 8)}... 已${action === 'approve' ? '通过' : '拒绝'}。`);
+            closeModal();
+            // 重新渲染面板以更新状态
+            setupAdminPanel();
+        } else {
+            showToast(`操作失败: ${result.message || '请稍后重试。'}`);
+        }
+    }
+
+
+    async function downloadFile(button, fileType) {
+        const row = button.closest('tr');
+        const id = row.dataset.id;
+        const url = `/api/admin/download/${fileType}/${id}`;
+        
+        try {
+            const adminToken = localStorage.getItem('adminToken');
+            if (!adminToken) {
+              showToast('请先登录管理员账户');
+              showModal('admin-login-form');
+              return;
+            }
+            
+            const response = await fetch(`${WORKER_URL}${url}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${adminToken}`,
+                },
+            });
+            
+            if (!response.ok) {
+              if (response.status === 401) {
+                localStorage.removeItem('adminToken');
+                hideAdminPanelCard();
+                showToast('会话过期，请重新登录。');
+                return;
+              }
+              const errorText = await response.text();
+              showToast(`下载失败: ${errorText}`);
+              return;
+            }
+            
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = downloadUrl;
+            
+            let filename = '';
+            const contentDisposition = response.headers.get('Content-Disposition');
+            if (contentDisposition) {
+              const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+              if (filenameMatch) {
+                filename = filenameMatch[1];
+              }
+            }
+            
+            a.download = filename || `${id}-${fileType}.${fileType === 'description' ? 'md' : 'zip'}`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(downloadUrl);
+            document.body.removeChild(a);
+            showToast('下载成功！');
+
+        } catch (error) {
+            console.error('Download failed:', error);
+            showToast('下载失败，请检查网络或稍后重试。');
+        }
+    }
+
+
+    // 禁用 F12, Ctrl+Shift+I 和右键菜单，并增加 Ctrl+Shift+L
+    document.addEventListener('keydown', (e) => {
+      // 禁用 F12
+      if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault();
+        showToast('F12 已被禁用。');
+      }
+      // 禁用 Ctrl+Shift+I
+      if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+        e.preventDefault();
+        showToast('Ctrl+Shift+I 已被禁用。');
+      }
+      // Ctrl+Shift+L 进入管理员登录
+      if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+        e.preventDefault();
+        showModal('admin-login-form');
+      }
+    });
+
+    // 禁用右键菜单
+    document.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      showToast('右键菜单已被禁用。');
+    });
+
+    // DevTools检测
     const checkDevTools = () => {
       const isDevToolsOpen = window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100;
       if (isDevToolsOpen) {
@@ -739,42 +800,8 @@
     };
     setInterval(checkDevTools, 500);
 
-    // 禁用 F12, Ctrl+Shift+I 和右键菜单，并增加 Ctrl+Shift+L
-    document.addEventListener('keydown', (e) => {
-      // 禁用 F12
-      if (e.key === 'F12' || e.keyCode === 123) {
-        e.preventDefault();
-        showToast('F12 已被禁用。');
-      }
-      // 禁用 Ctrl+Shift+I
-      if (e.ctrlKey && e.shiftKey && e.key === 'I') {
-        e.preventDefault();
-        showToast('Ctrl+Shift+I 已被禁用。');
-      }
-      // Ctrl+Shift+L 进入管理员登录
-      if (e.ctrlKey && e.shiftKey && e.key === 'L') {
-        e.preventDefault();
-        navigateTo('admin-login-form');
-        showToast('进入管理员登录页面。');
-      }
-    });
-
-    document.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      showToast('右键菜单已禁用。');
-    });
-
-    // 检查是否有sessionKey
-    const sessionKey = localStorage.getItem('sessionKey');
-    if (sessionKey) {
-      isAdminAuthenticated = true;
-      document.getElementById('nav-admin').classList.remove('hidden');
-    }
-  });
-
-</script>
-
+    // 页面加载时执行
+    window.onload = checkAdminStatusOnLoad;
+  </script>
 </body>
 </html>
-
-
