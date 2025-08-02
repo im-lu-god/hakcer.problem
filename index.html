@@ -68,6 +68,76 @@
       color: #ffffff;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
+    /* 模态框样式 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-content {
+      background-color: #ffffff;
+      border-radius: 1rem;
+      padding: 2rem;
+      width: 90%;
+      max-width: 60rem;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
+    .modal-overlay.visible .modal-content {
+      transform: scale(1);
+    }
+    .markdown-body {
+        line-height: 1.6;
+        word-wrap: break-word;
+    }
+    .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+        font-weight: bold;
+        margin-top: 1em;
+        margin-bottom: 0.5em;
+    }
+    .markdown-body h1 { font-size: 1.5em; }
+    .markdown-body h2 { font-size: 1.25em; }
+    .markdown-body h3 { font-size: 1.1em; }
+    .markdown-body p {
+        margin-bottom: 1em;
+    }
+    .markdown-body ul, .markdown-body ol {
+        padding-left: 2em;
+        margin-bottom: 1em;
+    }
+    .markdown-body pre {
+        background-color: #f6f8fa;
+        border-radius: 6px;
+        padding: 16px;
+        overflow: auto;
+        line-height: 1.45;
+    }
+    .markdown-body code {
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+        background-color: #f6f8fa;
+        border-radius: 6px;
+        padding: 0.2em 0.4em;
+    }
+    .markdown-body pre > code {
+        background-color: transparent;
+        padding: 0;
+    }
   </style>
 </head>
 <body>
@@ -80,7 +150,6 @@
     </header>
 
     <nav class="flex justify-center space-x-4 md:space-x-8">
-      <button id="nav-comp" class="nav-btn">比赛申请</button>
       <button id="nav-problem" class="nav-btn">题目提交</button>
       <button id="nav-status" class="nav-btn">状态查询</button>
       <button id="nav-admin" class="nav-btn hidden">管理面板</button>
@@ -92,26 +161,7 @@
         <p>欢迎使用公开赛审核平台。请从上方导航栏选择一个功能。</p>
       </div>
 
-      <div id="comp-apply-form" class="space-y-4 hidden">
-        <h2 class="text-2xl font-semibold text-gray-700">比赛申请</h2>
-        <form id="comp-form" class="space-y-4">
-          <div>
-            <label for="comp-name" class="block text-sm font-medium text-gray-700">队伍名称</label>
-            <input id="comp-name" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
-          </div>
-          <div>
-            <label for="comp-members" class="block text-sm font-medium text-gray-700">队员（用逗号分隔）</label>
-            <input id="comp-members" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
-          </div>
-          <div>
-            <label for="comp-details" class="block text-sm font-medium text-gray-700">比赛详情</label>
-            <textarea id="comp-details" rows="6" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required></textarea>
-          </div>
-          <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-700 transition-colors shadow-lg">提交申请</button>
-        </form>
-      </div>
-
-      <!-- 新增的题目提交表单 -->
+      <!-- 题目提交表单 -->
       <div id="problem-submission-form" class="space-y-4 hidden">
         <h2 class="text-2xl font-semibold text-gray-700">题目提交</h2>
         <form id="problem-form" class="space-y-4">
@@ -203,6 +253,19 @@
 
 <div id="toast" class="toast"></div>
 
+<!-- 题目详情模态框 -->
+<div id="application-details-modal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="flex justify-between items-center">
+      <h3 class="text-2xl font-bold text-gray-800">题目详情</h3>
+      <button id="close-modal-btn" class="text-gray-500 hover:text-gray-700">&times;</button>
+    </div>
+    <div id="details-content" class="mt-4 space-y-4">
+      <!-- 题目详情将在这里加载 -->
+    </div>
+  </div>
+</div>
+
 <script>
   // 模拟的后端URL，请在部署到Cloudflare Worker后修改此URL
   const BACKEND_URL = 'https://hackerapi.mr-onion-blog.fun/api';
@@ -224,6 +287,9 @@
   const emailError = document.getElementById('email-error');
   const fileInput = document.getElementById('problem-zip');
   const fileError = document.getElementById('file-error');
+
+  const detailsModal = document.getElementById('application-details-modal');
+  const detailsContent = document.getElementById('details-content');
 
   let currentView = 'home';
   let isAdminAuthenticated = false;
@@ -250,7 +316,6 @@
     navButtons.forEach(btn => {
       btn.classList.remove('active-blue', 'active-purple');
       if (
-        (viewId === 'comp-apply-form' && btn.id === 'nav-comp') ||
         (viewId === 'problem-submission-form' && btn.id === 'nav-problem') ||
         (viewId === 'status-query-form' && btn.id === 'nav-status') ||
         (viewId === 'admin-dashboard' && btn.id === 'nav-admin')
@@ -258,6 +323,41 @@
         btn.classList.add(btn.id === 'nav-admin' ? 'active-purple' : 'active-blue');
       }
     });
+  }
+
+  // 辅助函数：简单的 Markdown 渲染
+  function renderMarkdown(markdown) {
+    // 处理代码块
+    const codeBlockRegex = /```(\w+)?\n([\s\S]+?)\n```/g;
+    let html = markdown.replace(codeBlockRegex, (match, p1, p2) => {
+      return `<pre><code>${p2.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+    });
+
+    // 处理行内代码
+    const inlineCodeRegex = /`([^`]+)`/g;
+    html = html.replace(inlineCodeRegex, '<code>$1</code>');
+
+    // 处理粗体
+    const boldRegex = /\*\*(.*?)\*\*|__(.*?)__/g;
+    html = html.replace(boldRegex, '<strong>$1$2</strong>');
+
+    // 处理斜体
+    const italicRegex = /\*(.*?)\*|_(.*?)_/g;
+    html = html.replace(italicRegex, '<em>$1$2</em>');
+
+    // 处理标题
+    html = html.replace(/^###\s(.*$)/gim, '<h3>$1</h3>');
+    html = html.replace(/^##\s(.*$)/gim, '<h2>$1</h2>');
+    html = html.replace(/^#\s(.*$)/gim, '<h1>$1</h1>');
+    
+    // 处理无序列表
+    html = html.replace(/^\s*[-*]\s(.*$)/gim, '<li>$1</li>');
+    html = `<ul>${html}</ul>`;
+
+    // 处理段落和换行
+    html = html.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+
+    return `<div class="markdown-body"><p>${html}</p></div>`;
   }
 
   // 辅助函数：渲染提交结果
@@ -293,11 +393,8 @@
           <p class="text-gray-600">申请ID: <code class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md font-mono">${data.id}</code></p>
           <div class="p-4 rounded-lg bg-white border">
             <p class="font-semibold text-gray-700">状态: <span class="font-bold text-lg text-blue-600">${data.status}</span></p>
-            <p class="mt-2 text-sm text-gray-500">${data.type === 'comp' ? '比赛申请' : '题目提交'}</p>
-            ${data.name ? `<p class="mt-1 text-sm text-gray-500">申请人/队伍名称: ${data.name}</p>` : ''}
+            <p class="mt-2 text-sm text-gray-500">题目提交</p>
             ${data.email ? `<p class="mt-1 text-sm text-gray-500">邮箱: ${data.email}</p>` : ''}
-            ${data.members ? `<p class="mt-1 text-sm text-gray-500">队员: ${data.members.join(', ')}</p>` : ''}
-            ${data.competitionDetails ? `<p class="mt-1 text-sm text-gray-500">比赛详情: ${data.competitionDetails}</p>` : ''}
             ${data.ojNickname ? `<p class="mt-1 text-sm text-gray-500">OJ昵称: ${data.ojNickname}</p>` : ''}
             ${data.uid ? `<p class="mt-1 text-sm text-gray-500">UID: ${data.uid}</p>` : ''}
             ${data.awards ? `<p>获奖经历: ${data.awards}</p>` : ''}
@@ -322,35 +419,10 @@
   }
 
   // 事件监听器
-  document.getElementById('nav-comp').addEventListener('click', () => navigateTo('comp-apply-form'));
   document.getElementById('nav-problem').addEventListener('click', () => navigateTo('problem-submission-form'));
   document.getElementById('nav-status').addEventListener('click', () => navigateTo('status-query-form'));
   document.getElementById('nav-admin').addEventListener('click', () => fetchAdminApplications());
 
-  document.getElementById('comp-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('comp-name').value;
-    const teamMembers = document.getElementById('comp-members').value;
-    const competitionDetails = document.getElementById('comp-details').value;
-    
-    try {
-      const members = teamMembers.split(',').map(m => m.trim());
-      const response = await fetch(`${BACKEND_URL}/apply-comp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, members, competitionDetails }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || '提交失败');
-      renderSubmissionResult('success', result.id);
-      navigateTo('submission-result');
-    } catch (error) {
-      console.error('提交错误:', error);
-      renderSubmissionResult('error');
-      navigateTo('submission-result');
-    }
-  });
-  
   // 题目提交表单提交事件
   document.getElementById('problem-form').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -496,32 +568,152 @@
         applicationsList.innerHTML = '<div class="text-center p-8 text-gray-500">目前没有待处理的申请。</div>';
       } else {
         applicationsList.innerHTML = applications.map(app => `
-          <div class="py-4">
-            <div class="flex justify-between items-start">
-              <div>
-                <p class="font-medium text-gray-800">
-                  ${app.type === 'comp' ? '比赛申请' : '题目提交'}
-                  <span class="ml-2 text-sm text-gray-500">ID: ${app.id}</span>
-                </p>
-                <p class="text-sm text-gray-600">状态: ${app.status}</p>
-              </div>
+          <div class="py-4 flex justify-between items-center">
+            <div>
+              <p class="font-medium text-gray-800">
+                题目提交
+                <span class="ml-2 text-sm text-gray-500">ID: ${app.id}</span>
+              </p>
+              <p class="text-sm text-gray-600">状态: <span class="font-semibold">${app.status}</span></p>
+              <p class="text-sm text-gray-500">题目: ${app.problemTitle}</p>
             </div>
-            <div class="mt-2 text-sm text-gray-500">
-              ${app.name ? `<p>名称: ${app.name}</p>` : ''}
-              ${app.email ? `<p>邮箱: ${app.email}</p>` : ''}
-              ${app.members ? `<p>队员: ${app.members.join(', ')}</p>` : ''}
-              ${app.competitionDetails ? `<p>比赛详情: ${app.competitionDetails}</p>` : ''}
-              ${app.ojNickname ? `<p>OJ昵称: ${app.ojNickname}</p>` : ''}
-              ${app.uid ? `<p>UID: ${app.uid}</p>` : ''}
-              ${app.awards ? `<p>获奖经历: ${app.awards}</p>` : ''}
-              ${app.problemTitle ? `<p>题目标题: ${app.problemTitle}</p>` : ''}
-              ${app.difficulty ? `<p>难度: ${app.difficulty}</p>` : ''}
-            </div>
+            <button class="view-details-btn px-4 py-2 text-sm rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors font-medium" data-id="${app.id}">查看详情</button>
           </div>
         `).join('');
+        
+        // 为每个详情按钮添加事件监听器
+        document.querySelectorAll('.view-details-btn').forEach(button => {
+          button.addEventListener('click', (e) => {
+            const id = e.target.dataset.id;
+            fetchApplicationDetails(id);
+          });
+        });
       }
     } catch (err) {
       applicationsList.innerHTML = `<div class="text-center p-8 text-red-500">错误: ${err.message}</div>`;
+    }
+  }
+
+  // 获取并显示题目详情
+  async function fetchApplicationDetails(id) {
+    const sessionKey = localStorage.getItem('sessionKey');
+    if (!sessionKey) {
+      showToast('请先登录。');
+      navigateTo('admin-login-form');
+      return;
+    }
+    
+    detailsContent.innerHTML = '<div class="text-center text-gray-500">加载中...</div>';
+    detailsModal.classList.add('visible');
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/admin/application/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${sessionKey}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('无法获取题目详情');
+      }
+
+      const application = await response.json();
+      
+      let rejectionReasonHtml = '';
+      if (application.rejectionReason) {
+        rejectionReasonHtml = `<p class="text-red-500 font-semibold">打回理由: ${application.rejectionReason}</p>`;
+      }
+
+      detailsContent.innerHTML = `
+        <div>
+          <p class="text-sm text-gray-500">ID: ${application.id}</p>
+          <p class="text-sm text-gray-500">状态: <span class="font-bold text-lg text-blue-600">${application.status}</span></p>
+          ${rejectionReasonHtml}
+          <p class="text-sm text-gray-500">提交者: ${application.ojNickname} (UID: ${application.uid})</p>
+          <p class="text-sm text-gray-500">邮箱: ${application.email}</p>
+          ${application.awards ? `<p class="text-sm text-gray-500">获奖经历: ${application.awards}</p>` : ''}
+          <p class="text-sm text-gray-500">题目标题: ${application.problemTitle}</p>
+          <p class="text-sm text-gray-500">难度: ${application.difficulty}</p>
+        </div>
+        <div class="mt-4">
+          <h4 class="text-lg font-semibold">题目描述</h4>
+          <div class="border p-4 rounded-lg bg-gray-50 overflow-y-auto max-h-[30vh]">
+            ${renderMarkdown(application.problemDescription)}
+          </div>
+        </div>
+        <div class="mt-4">
+          <button id="download-zip-btn" data-base64="${application.problemFile}" data-filename="${application.problemTitle || 'problem'}-${application.id}.zip" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors">下载题目文件 (.zip)</button>
+        </div>
+        ${application.status === '待审核' ? `
+        <div class="mt-4 flex flex-col space-y-2">
+          <textarea id="rejection-reason" class="w-full rounded-md border-gray-300 shadow-sm" placeholder="请输入打回理由 (可选)"></textarea>
+          <div class="flex space-x-2">
+            <button id="approve-btn" data-id="${application.id}" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">通过</button>
+            <button id="reject-btn" data-id="${application.id}" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">打回</button>
+          </div>
+        </div>
+        ` : ''}
+      `;
+
+      // 添加下载按钮的事件监听器
+      const downloadBtn = document.getElementById('download-zip-btn');
+      if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => {
+          const base64Data = downloadBtn.dataset.base64;
+          const filename = downloadBtn.dataset.filename;
+          const link = document.createElement('a');
+          link.href = `data:application/zip;base64,${base64Data}`;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          showToast('文件下载中...');
+        });
+      }
+
+      // 添加审核按钮的事件监听器
+      const approveBtn = document.getElementById('approve-btn');
+      const rejectBtn = document.getElementById('reject-btn');
+      if (approveBtn) {
+        approveBtn.addEventListener('click', () => updateApplicationStatus(approveBtn.dataset.id, '已通过'));
+      }
+      if (rejectBtn) {
+        rejectBtn.addEventListener('click', () => {
+          const reason = document.getElementById('rejection-reason').value;
+          updateApplicationStatus(rejectBtn.dataset.id, '已打回', reason);
+        });
+      }
+
+    } catch (error) {
+      detailsContent.innerHTML = `<div class="text-center text-red-500">错误: ${error.message}</div>`;
+    }
+  }
+
+  // 关闭模态框
+  document.getElementById('close-modal-btn').addEventListener('click', () => {
+    detailsModal.classList.remove('visible');
+  });
+
+  // 更新申请状态
+  async function updateApplicationStatus(id, status, reason = '') {
+    const sessionKey = localStorage.getItem('sessionKey');
+    try {
+      const response = await fetch(`${BACKEND_URL}/admin/application/update-status`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionKey}`,
+        },
+        body: JSON.stringify({ id, status, reason }),
+      });
+      if (!response.ok) {
+        throw new Error('更新状态失败');
+      }
+      showToast(`申请 ${id} 已${status}`);
+      detailsModal.classList.remove('visible');
+      fetchAdminApplications(); // 重新加载列表
+    } catch (error) {
+      showToast(`更新状态失败: ${error.message}`);
     }
   }
 
@@ -584,4 +776,5 @@
 
 </body>
 </html>
+
 
