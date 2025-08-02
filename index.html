@@ -245,7 +245,7 @@
     
     // ⚠️重要：如果希望开启开发者工具检测并强制刷新，请将此变量设置为 true
     // 如果设置为 false，则只提示，不刷新
-    const shouldRefreshOnDevTools = false;
+    const shouldRefreshOnDevTools = true;
 
     /**
      * 封装的后端 API 调用函数，处理请求头和错误
@@ -508,7 +508,7 @@
       const emailError = document.getElementById('email-error');
       const fileInput = form.querySelector('[name="problemFile"]');
       const fileError = document.getElementById('file-error');
-      const FILE_SIZE_LIMIT = 1024 * 1024; // 1MB
+      const FILE_SIZE_LIMIT = 10 * 1024; // 10KB
       const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
       emailInput.addEventListener('input', () => {
@@ -754,8 +754,56 @@
         }
     }
 
+    // ==========================================================
+    // 修复后的开发者工具检测逻辑
+    // ==========================================================
+    let devtoolsOpen = false;
+    let devtoolsDetectionTimer;
+    const devtoolsCheck = () => {
+        // 使用一个简单的函数来检测，减少误报
+        const check = () => {
+            // 通过检查函数字符串表示的长度来检测，当DevTools打开时，
+            // toString()的输出可能被修改，导致长度变化
+            const f = () => {};
+            if (f.toString().length !== 22) {
+                return true;
+            }
+            // 尝试触发debugger，并检查是否暂停
+            const d = new Date();
+            debugger; // This line will pause execution in DevTools
+            const diff = new Date() - d;
+            // 如果时间差非常大，则很可能处于调试状态
+            if (diff > 500) { 
+                return true;
+            }
+            return false;
+        };
 
-    // 禁用 F12, Ctrl+Shift+I 和右键菜单，并增加 Ctrl+Shift+L
+        if (check()) {
+            if (!devtoolsOpen) {
+                devtoolsOpen = true;
+                if (shouldRefreshOnDevTools) {
+                    showToast('警告: 检测到开发者工具已打开！页面将反复刷新。');
+                    devtoolsDetectionTimer = setInterval(() => {
+                        location.reload();
+                    }, 500);
+                } else {
+                    showToast('警告: 检测到开发者工具已打开！');
+                }
+            }
+        } else {
+            if (devtoolsOpen) {
+                devtoolsOpen = false;
+                showToast('开发者工具已关闭。');
+                clearInterval(devtoolsDetectionTimer);
+            }
+        }
+    };
+    
+    // 每秒检查一次
+    setInterval(devtoolsCheck, 1000);
+
+    // 禁用 F12, Ctrl+Shift+I
     document.addEventListener('keydown', (e) => {
       // 禁用 F12
       if (e.key === 'F12' || e.keyCode === 123) {
@@ -779,26 +827,6 @@
       e.preventDefault();
       showToast('右键菜单已被禁用。');
     });
-
-    // DevTools检测
-    const checkDevTools = () => {
-      const isDevToolsOpen = window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100;
-      if (isDevToolsOpen) {
-        // 如果开发者工具已打开，并且标志为true，则反复刷新页面
-        if (shouldRefreshOnDevTools) {
-          showToast('警告: 检测到开发者工具已打开！页面将反复刷新。');
-          // 设置一个定时器来反复刷新页面
-          setInterval(() => {
-            location.reload();
-          }, 500);
-        } else {
-          showToast('警告: 检测到开发者工具已打开！');
-        }
-        // 调用 debugger 以立即暂停执行
-        (function() { debugger; })();
-      }
-    };
-    setInterval(checkDevTools, 500);
 
     // 页面加载时执行
     window.onload = checkAdminStatusOnLoad;
