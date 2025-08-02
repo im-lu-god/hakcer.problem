@@ -80,8 +80,8 @@
     </header>
 
     <nav class="flex justify-center space-x-4 md:space-x-8">
-      <button id="nav-quiz" class="nav-btn">答题申请</button>
       <button id="nav-comp" class="nav-btn">比赛申请</button>
+      <button id="nav-problem" class="nav-btn">题目提交</button>
       <button id="nav-status" class="nav-btn">状态查询</button>
       <button id="nav-admin" class="nav-btn hidden">管理面板</button>
     </nav>
@@ -90,25 +90,6 @@
       <!-- 页面内容将在这里动态加载 -->
       <div id="home-page" class="text-center p-8 text-gray-500">
         <p>欢迎使用公开赛审核平台。请从上方导航栏选择一个功能。</p>
-      </div>
-
-      <div id="quiz-apply-form" class="space-y-4 hidden">
-        <h2 class="text-2xl font-semibold text-gray-700">答题申请</h2>
-        <form id="quiz-form" class="space-y-4">
-          <div>
-            <label for="quiz-name" class="block text-sm font-medium text-gray-700">姓名</label>
-            <input id="quiz-name" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
-          </div>
-          <div>
-            <label for="quiz-email" class="block text-sm font-medium text-gray-700">邮箱</label>
-            <input id="quiz-email" type="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
-          </div>
-          <div>
-            <label for="quiz-answers" class="block text-sm font-medium text-gray-700">答案（请在下方填写）</label>
-            <textarea id="quiz-answers" rows="6" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required></textarea>
-          </div>
-          <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-700 transition-colors shadow-lg">提交申请</button>
-        </form>
       </div>
 
       <div id="comp-apply-form" class="space-y-4 hidden">
@@ -127,6 +108,57 @@
             <textarea id="comp-details" rows="6" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required></textarea>
           </div>
           <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-700 transition-colors shadow-lg">提交申请</button>
+        </form>
+      </div>
+
+      <!-- 新增的题目提交表单 -->
+      <div id="problem-submission-form" class="space-y-4 hidden">
+        <h2 class="text-2xl font-semibold text-gray-700">题目提交</h2>
+        <form id="problem-form" class="space-y-4">
+          <div>
+            <label for="oj-nickname" class="block text-sm font-medium text-gray-700">OJ昵称</label>
+            <input id="oj-nickname" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
+          </div>
+          <div>
+            <label for="user-uid" class="block text-sm font-medium text-gray-700">UID</label>
+            <input id="user-uid" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
+          </div>
+          <div>
+            <label for="user-email" class="block text-sm font-medium text-gray-700">邮箱</label>
+            <input id="user-email" type="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
+            <p id="email-error" class="mt-1 text-sm text-red-500 hidden">请输入正确的邮箱格式。</p>
+          </div>
+          <div>
+            <label for="user-awards" class="block text-sm font-medium text-gray-700">获奖经历 (可选)</label>
+            <textarea id="user-awards" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors"></textarea>
+          </div>
+          <div>
+            <label for="problem-title" class="block text-sm font-medium text-gray-700">题目标题</label>
+            <input id="problem-title" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
+          </div>
+          <div>
+            <label for="problem-difficulty" class="block text-sm font-medium text-gray-700">难度</label>
+            <select id="problem-difficulty" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
+              <option value="">请选择难度...</option>
+              <option value="入门">入门</option>
+              <option value="普及-">普及-</option>
+              <option value="普及/提高-">普及/提高-</option>
+              <option value="普及+/提高">普及+/提高</option>
+              <option value="提高+/省选">提高+/省选</option>
+              <option value="省选/NOI-">省选/NOI-</option>
+              <option value="NOI/NOI+/CTSC">NOI/NOI+/CTSC</option>
+            </select>
+          </div>
+          <div>
+            <label for="problem-description" class="block text-sm font-medium text-gray-700">题目描述</label>
+            <textarea id="problem-description" rows="6" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required></textarea>
+          </div>
+          <div>
+            <label for="problem-zip" class="block text-sm font-medium text-gray-700">题目文件 (.zip, 不超过10KB)</label>
+            <input id="problem-zip" type="file" accept=".zip" class="mt-1 block w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors" required>
+            <p id="file-error" class="mt-1 text-sm text-red-500 hidden">文件大小不能超过10KB。</p>
+          </div>
+          <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-700 transition-colors shadow-lg">提交题目</button>
         </form>
       </div>
 
@@ -175,14 +207,23 @@
   // 模拟的后端URL，请在部署到Cloudflare Worker后修改此URL
   const BACKEND_URL = 'https://hackerapi.mr-onion-blog.fun/api';
   
-  // ==================== Anti-Debug功能控制标志 ====================
+  // ==================== 反调试功能控制标志 ====================
   // 如果设置为 true，在检测到开发者工具打开时，页面将反复刷新
-  const shouldRefreshOnDevTools = true; 
+  const shouldRefreshOnDevTools = false; 
   // ================================================================
+
+  // Email regex for validation
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // File size limit in bytes (10KB)
+  const FILE_SIZE_LIMIT = 10 * 1024;
 
   const mainContent = document.getElementById('main-content');
   const toastElement = document.getElementById('toast');
   const navButtons = document.querySelectorAll('nav button');
+  const emailInput = document.getElementById('user-email');
+  const emailError = document.getElementById('email-error');
+  const fileInput = document.getElementById('problem-zip');
+  const fileError = document.getElementById('file-error');
 
   let currentView = 'home';
   let isAdminAuthenticated = false;
@@ -209,8 +250,8 @@
     navButtons.forEach(btn => {
       btn.classList.remove('active-blue', 'active-purple');
       if (
-        (viewId === 'quiz-apply-form' && btn.id === 'nav-quiz') ||
         (viewId === 'comp-apply-form' && btn.id === 'nav-comp') ||
+        (viewId === 'problem-submission-form' && btn.id === 'nav-problem') ||
         (viewId === 'status-query-form' && btn.id === 'nav-status') ||
         (viewId === 'admin-dashboard' && btn.id === 'nav-admin')
       ) {
@@ -252,12 +293,16 @@
           <p class="text-gray-600">申请ID: <code class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md font-mono">${data.id}</code></p>
           <div class="p-4 rounded-lg bg-white border">
             <p class="font-semibold text-gray-700">状态: <span class="font-bold text-lg text-blue-600">${data.status}</span></p>
-            <p class="mt-2 text-sm text-gray-500">${data.type === 'quiz' ? '答题申请' : '比赛申请'}</p>
+            <p class="mt-2 text-sm text-gray-500">${data.type === 'comp' ? '比赛申请' : '题目提交'}</p>
             ${data.name ? `<p class="mt-1 text-sm text-gray-500">申请人/队伍名称: ${data.name}</p>` : ''}
             ${data.email ? `<p class="mt-1 text-sm text-gray-500">邮箱: ${data.email}</p>` : ''}
             ${data.members ? `<p class="mt-1 text-sm text-gray-500">队员: ${data.members.join(', ')}</p>` : ''}
             ${data.competitionDetails ? `<p class="mt-1 text-sm text-gray-500">比赛详情: ${data.competitionDetails}</p>` : ''}
-            ${data.answers ? `<p class="mt-1 text-sm text-gray-500">答案: ${data.answers}</p>` : ''}
+            ${data.ojNickname ? `<p class="mt-1 text-sm text-gray-500">OJ昵称: ${data.ojNickname}</p>` : ''}
+            ${data.uid ? `<p class="mt-1 text-sm text-gray-500">UID: ${data.uid}</p>` : ''}
+            ${data.awards ? `<p>获奖经历: ${data.awards}</p>` : ''}
+            ${data.problemTitle ? `<p class="mt-1 text-sm text-gray-500">题目标题: ${data.problemTitle}</p>` : ''}
+            ${data.difficulty ? `<p>难度: ${data.difficulty}</p>` : ''}
           </div>
         </div>
       `;
@@ -277,33 +322,10 @@
   }
 
   // 事件监听器
-  document.getElementById('nav-quiz').addEventListener('click', () => navigateTo('quiz-apply-form'));
   document.getElementById('nav-comp').addEventListener('click', () => navigateTo('comp-apply-form'));
+  document.getElementById('nav-problem').addEventListener('click', () => navigateTo('problem-submission-form'));
   document.getElementById('nav-status').addEventListener('click', () => navigateTo('status-query-form'));
   document.getElementById('nav-admin').addEventListener('click', () => fetchAdminApplications());
-
-  document.getElementById('quiz-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('quiz-name').value;
-    const email = document.getElementById('quiz-email').value;
-    const answers = document.getElementById('quiz-answers').value;
-    
-    try {
-      const response = await fetch(`${BACKEND_URL}/apply-quiz`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, answers }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || '提交失败');
-      renderSubmissionResult('success', result.id);
-      navigateTo('submission-result');
-    } catch (error) {
-      console.error('提交错误:', error);
-      renderSubmissionResult('error');
-      navigateTo('submission-result');
-    }
-  });
 
   document.getElementById('comp-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -327,6 +349,69 @@
       renderSubmissionResult('error');
       navigateTo('submission-result');
     }
+  });
+  
+  // 题目提交表单提交事件
+  document.getElementById('problem-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    // 验证邮箱格式
+    if (!EMAIL_REGEX.test(document.getElementById('user-email').value)) {
+      document.getElementById('email-error').classList.remove('hidden');
+      showToast('请输入正确的邮箱格式。');
+      return;
+    } else {
+      document.getElementById('email-error').classList.add('hidden');
+    }
+
+    const file = document.getElementById('problem-zip').files[0];
+    if (!file) {
+      showToast('请选择一个 .zip 文件。');
+      return;
+    }
+
+    // 检查文件大小
+    if (file.size > FILE_SIZE_LIMIT) {
+      document.getElementById('file-error').classList.remove('hidden');
+      showToast('文件大小超过10KB限制。');
+      return;
+    } else {
+      document.getElementById('file-error').classList.add('hidden');
+    }
+
+    // 使用 FileReader 读取文件并进行 Base64 编码
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64Content = e.target.result.split(',')[1];
+      const payload = {
+        ojNickname: document.getElementById('oj-nickname').value,
+        uid: document.getElementById('user-uid').value,
+        email: document.getElementById('user-email').value,
+        awards: document.getElementById('user-awards').value,
+        problemTitle: document.getElementById('problem-title').value,
+        difficulty: document.getElementById('problem-difficulty').value,
+        problemDescription: document.getElementById('problem-description').value,
+        problemFile: base64Content,
+      };
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/submit-problem`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || '提交失败');
+        renderSubmissionResult('success', result.id);
+        navigateTo('submission-result');
+      } catch (error) {
+        console.error('提交错误:', error);
+        showToast('提交失败，请检查网络或后端配置。');
+        renderSubmissionResult('error');
+        navigateTo('submission-result');
+      }
+    };
+    reader.readAsDataURL(file);
   });
 
   document.getElementById('status-form').addEventListener('submit', async (e) => {
@@ -415,18 +500,22 @@
             <div class="flex justify-between items-start">
               <div>
                 <p class="font-medium text-gray-800">
-                  ${app.type === 'quiz' ? '答题申请' : '比赛申请'}
+                  ${app.type === 'comp' ? '比赛申请' : '题目提交'}
                   <span class="ml-2 text-sm text-gray-500">ID: ${app.id}</span>
                 </p>
                 <p class="text-sm text-gray-600">状态: ${app.status}</p>
               </div>
             </div>
             <div class="mt-2 text-sm text-gray-500">
-              <p>名称: ${app.name}</p>
+              ${app.name ? `<p>名称: ${app.name}</p>` : ''}
               ${app.email ? `<p>邮箱: ${app.email}</p>` : ''}
               ${app.members ? `<p>队员: ${app.members.join(', ')}</p>` : ''}
               ${app.competitionDetails ? `<p>比赛详情: ${app.competitionDetails}</p>` : ''}
-              ${app.answers ? `<p>答案: ${app.answers}</p>` : ''}
+              ${app.ojNickname ? `<p>OJ昵称: ${app.ojNickname}</p>` : ''}
+              ${app.uid ? `<p>UID: ${app.uid}</p>` : ''}
+              ${app.awards ? `<p>获奖经历: ${app.awards}</p>` : ''}
+              ${app.problemTitle ? `<p>题目标题: ${app.problemTitle}</p>` : ''}
+              ${app.difficulty ? `<p>难度: ${app.difficulty}</p>` : ''}
             </div>
           </div>
         `).join('');
@@ -495,3 +584,4 @@
 
 </body>
 </html>
+
