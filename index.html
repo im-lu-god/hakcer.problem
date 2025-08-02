@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公开赛审核平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .main-container {
+      background-color: #f3f4f6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .card {
+      background-color: #ffffff;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      border-radius: 1rem;
+      width: 100%;
+      max-width: 42rem;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .toast {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 50;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      background-color: #1f2937;
+      color: #ffffff;
+      transition: opacity 0.3s ease-in-out;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .toast.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .nav-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      transition-property: background-color, color, box-shadow;
+      transition-duration: 300ms;
+      font-weight: 500;
+      color: #4b5563;
+      background-color: #e5e7eb;
+    }
+    .nav-btn:hover {
+      background-color: #d1d5db;
+    }
+    .nav-btn.active-blue {
+      background-color: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .nav-btn.active-purple {
+      background-color: #6d28d9;
+      color: #ffffff;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-container">
+  <div class="card">
+    <header class="text-center">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-800">公开赛审核平台</h1>
+      <p class="text-gray-500 mt-2">请选择你要进行的操作</p>
+    </header>
+
+    <nav class="flex justify-center space-x-4 md:space-x-8">
+      <button id="nav-quiz" class="nav-btn">答题申请</button>
+      <button id="nav-comp" class="nav-btn">比赛申请</button>
+      <button id="nav-status" class="nav-btn">状态查询</button>
+      <button id="nav-admin" class="nav-btn hidden">管理面板</button>
+    </nav>
+
+    <main id="main-content" class="mt-6 p-4 border rounded-xl bg-gray-50">
+      <!-- 页面内容将在这里动态加载 -->
+      <div id="home-page" class="text-center p-8 text-gray-500">
+        <p>欢迎使用公开赛审核平台。请从上方导航栏选择一个功能。</p>
+      </div>
+
+      <div id="quiz-apply-form" class="space-y-4 hidden">
+        <h2 class="text-2xl font-semibold text-gray-700">答题申请</h2>
+        <form id="quiz-form" class="space-y-4">
+          <div>
+            <label for="quiz-name" class="block text-sm font-medium text-gray-700">姓名</label>
+            <input id="quiz-name" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
+          </div>
+          <div>
+            <label for="quiz-email" class="block text-sm font-medium text-gray-700">邮箱</label>
+            <input id="quiz-email" type="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
+          </div>
+          <div>
+            <label for="quiz-answers" class="block text-sm font-medium text-gray-700">答案（请在下方填写）</label>
+            <textarea id="quiz-answers" rows="6" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required></textarea>
+          </div>
+          <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-700 transition-colors shadow-lg">提交申请</button>
+        </form>
+      </div>
+
+      <div id="comp-apply-form" class="space-y-4 hidden">
+        <h2 class="text-2xl font-semibold text-gray-700">比赛申请</h2>
+        <form id="comp-form" class="space-y-4">
+          <div>
+            <label for="comp-name" class="block text-sm font-medium text-gray-700">队伍名称</label>
+            <input id="comp-name" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
+          </div>
+          <div>
+            <label for="comp-members" class="block text-sm font-medium text-gray-700">队员（用逗号分隔）</label>
+            <input id="comp-members" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
+          </div>
+          <div>
+            <label for="comp-details" class="block text-sm font-medium text-gray-700">比赛详情</label>
+            <textarea id="comp-details" rows="6" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required></textarea>
+          </div>
+          <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-700 transition-colors shadow-lg">提交申请</button>
+        </form>
+      </div>
+
+      <div id="status-query-form" class="space-y-4 hidden">
+        <h2 class="text-2xl font-semibold text-gray-700">状态查询</h2>
+        <form id="status-form" class="space-y-4">
+          <div>
+            <label for="query-id" class="block text-sm font-medium text-gray-700">申请ID</label>
+            <input id="query-id" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
+          </div>
+          <button type="submit" class="w-full bg-green-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-green-700 transition-colors shadow-lg">查询状态</button>
+        </form>
+      </div>
+
+      <div id="submission-result" class="hidden">
+        <!-- 提交结果或查询结果将在这里动态显示 -->
+      </div>
+      
+      <div id="admin-login-form" class="space-y-4 hidden">
+        <h2 class="text-2xl font-semibold text-gray-700">管理员登录</h2>
+        <form id="admin-login" class="space-y-4">
+          <div>
+            <label for="admin-password" class="block text-sm font-medium text-gray-700">密码</label>
+            <input id="admin-password" type="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors" required>
+          </div>
+          <button type="submit" class="w-full bg-purple-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-purple-700 transition-colors shadow-lg">登录</button>
+        </form>
+      </div>
+
+      <div id="admin-dashboard" class="space-y-4 hidden">
+        <h2 class="text-2xl font-semibold text-gray-700 flex justify-between items-center">
+          所有申请列表
+          <button id="admin-logout-btn" class="px-4 py-2 text-sm rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors font-medium">退出登录</button>
+        </h2>
+        <div id="applications-list" class="divide-y divide-gray-200">
+          <!-- 申请列表将在这里加载 -->
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  // 模拟的后端URL，请在部署到Cloudflare Worker后修改此URL
+  const BACKEND_URL = 'https://hackerapi.mr-onion-blog.fun/api';
+  const mainContent = document.getElementById('main-content');
+  const toastElement = document.getElementById('toast');
+  const navButtons = document.querySelectorAll('nav button');
+
+  let currentView = 'home';
+  let isAdminAuthenticated = false;
+
+  // 辅助函数：显示Toast提示
+  function showToast(message) {
+    toastElement.textContent = message;
+    toastElement.classList.add('visible');
+    setTimeout(() => {
+      toastElement.classList.remove('visible');
+    }, 3000);
+  }
+
+  // 辅助函数：切换视图
+  function navigateTo(viewId) {
+    // 隐藏所有内容
+    document.querySelectorAll('#main-content > div').forEach(div => div.classList.add('hidden'));
+    
+    // 显示目标内容
+    document.getElementById(viewId).classList.remove('hidden');
+    currentView = viewId;
+
+    // 更新导航按钮状态
+    navButtons.forEach(btn => {
+      btn.classList.remove('active-blue', 'active-purple');
+      if (
+        (viewId === 'quiz-apply-form' && btn.id === 'nav-quiz') ||
+        (viewId === 'comp-apply-form' && btn.id === 'nav-comp') ||
+        (viewId === 'status-query-form' && btn.id === 'nav-status') ||
+        (viewId === 'admin-dashboard' && btn.id === 'nav-admin')
+      ) {
+        btn.classList.add(btn.id === 'nav-admin' ? 'active-purple' : 'active-blue');
+      }
+    });
+  }
+
+  // 辅助函数：渲染提交结果
+  function renderSubmissionResult(status, id, data) {
+    const resultDiv = document.getElementById('submission-result');
+    let content = '';
+
+    if (status === 'success') {
+      content = `
+        <div class="text-center p-8">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h2 class="text-xl font-bold mt-4 text-gray-800">申请提交成功！</h2>
+          <p class="mt-2 text-gray-600">你的申请ID是：<code class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md font-mono">${id}</code></p>
+          <p class="text-gray-500">请妥善保存此ID，以便后续查询状态。</p>
+        </div>
+      `;
+    } else if (status === 'error') {
+      content = `
+        <div class="text-center p-8">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h2 class="text-xl font-bold mt-4 text-gray-800">提交失败</h2>
+          <p class="mt-2 text-gray-600">请检查你的网络或稍后重试。</p>
+        </div>
+      `;
+    } else if (status === 'query-success') {
+      content = `
+        <div class="p-8 space-y-4">
+          <h2 class="text-2xl font-bold text-gray-800">申请状态查询结果</h2>
+          <p class="text-gray-600">申请ID: <code class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md font-mono">${data.id}</code></p>
+          <div class="p-4 rounded-lg bg-white border">
+            <p class="font-semibold text-gray-700">状态: <span class="font-bold text-lg text-blue-600">${data.status}</span></p>
+            <p class="mt-2 text-sm text-gray-500">${data.type === 'quiz' ? '答题申请' : '比赛申请'}</p>
+            ${data.name ? `<p class="mt-1 text-sm text-gray-500">申请人/队伍名称: ${data.name}</p>` : ''}
+            ${data.email ? `<p class="mt-1 text-sm text-gray-500">邮箱: ${data.email}</p>` : ''}
+            ${data.members ? `<p class="mt-1 text-sm text-gray-500">队员: ${data.members.join(', ')}</p>` : ''}
+            ${data.competitionDetails ? `<p class="mt-1 text-sm text-gray-500">比赛详情: ${data.competitionDetails}</p>` : ''}
+            ${data.answers ? `<p class="mt-1 text-sm text-gray-500">答案: ${data.answers}</p>` : ''}
+          </div>
+        </div>
+      `;
+    } else if (status === 'query-error') {
+      content = `
+        <div class="text-center p-8">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h2 class="text-xl font-bold mt-4 text-gray-800">查询失败</h2>
+          <p class="mt-2 text-gray-600">找不到该申请ID，请检查后重试。</p>
+        </div>
+      `;
+    }
+    resultDiv.innerHTML = content;
+    resultDiv.classList.remove('hidden');
+  }
+
+  // 事件监听器
+  document.getElementById('nav-quiz').addEventListener('click', () => navigateTo('quiz-apply-form'));
+  document.getElementById('nav-comp').addEventListener('click', () => navigateTo('comp-apply-form'));
+  document.getElementById('nav-status').addEventListener('click', () => navigateTo('status-query-form'));
+  document.getElementById('nav-admin').addEventListener('click', () => fetchAdminApplications());
+
+  document.getElementById('quiz-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('quiz-name').value;
+    const email = document.getElementById('quiz-email').value;
+    const answers = document.getElementById('quiz-answers').value;
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/apply-quiz`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, answers }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || '提交失败');
+      renderSubmissionResult('success', result.id);
+      navigateTo('submission-result');
+    } catch (error) {
+      console.error('提交错误:', error);
+      renderSubmissionResult('error');
+      navigateTo('submission-result');
+    }
+  });
+
+  document.getElementById('comp-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('comp-name').value;
+    const teamMembers = document.getElementById('comp-members').value;
+    const competitionDetails = document.getElementById('comp-details').value;
+    
+    try {
+      const members = teamMembers.split(',').map(m => m.trim());
+      const response = await fetch(`${BACKEND_URL}/apply-comp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, members, competitionDetails }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || '提交失败');
+      renderSubmissionResult('success', result.id);
+      navigateTo('submission-result');
+    } catch (error) {
+      console.error('提交错误:', error);
+      renderSubmissionResult('error');
+      navigateTo('submission-result');
+    }
+  });
+
+  document.getElementById('status-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('query-id').value;
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/status/${id}`);
+      if (!response.ok) throw new Error('查询失败，申请ID不存在');
+      const data = await response.json();
+      renderSubmissionResult('query-success', id, data);
+      navigateTo('submission-result');
+    } catch (error) {
+      console.error('查询错误:', error);
+      renderSubmissionResult('query-error');
+      navigateTo('submission-result');
+    }
+  });
+  
+  document.getElementById('admin-login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const password = document.getElementById('admin-password').value;
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error('登录失败');
+      localStorage.setItem('sessionKey', result.sessionKey);
+      isAdminAuthenticated = true;
+      document.getElementById('nav-admin').classList.remove('hidden');
+      showToast('管理员登录成功！');
+      fetchAdminApplications();
+    } catch (error) {
+      console.error('登录错误:', error);
+      showToast('登录失败，请检查密码。');
+      navigateTo('admin-login-form');
+    }
+  });
+
+  document.getElementById('admin-logout-btn').addEventListener('click', () => {
+    localStorage.removeItem('sessionKey');
+    isAdminAuthenticated = false;
+    document.getElementById('nav-admin').classList.add('hidden');
+    showToast('已退出管理员账号。');
+    navigateTo('home-page');
+  });
+  
+  // 管理员仪表盘：获取并渲染申请列表
+  async function fetchAdminApplications() {
+    const sessionKey = localStorage.getItem('sessionKey');
+    if (!sessionKey) {
+      showToast('请先登录管理员账号。');
+      navigateTo('admin-login-form');
+      return;
+    }
+    
+    navigateTo('admin-dashboard');
+    const applicationsList = document.getElementById('applications-list');
+    applicationsList.innerHTML = '<div class="text-center p-8 text-gray-500">加载中...</div>';
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/admin/applications`, {
+        headers: {
+          'Authorization': `Bearer ${sessionKey}`,
+        },
+      });
+
+      if (!response.ok) {
+        localStorage.removeItem('sessionKey');
+        isAdminAuthenticated = false;
+        showToast('认证信息已过期，请重新登录。');
+        navigateTo('admin-login-form');
+        return;
+      }
+
+      const applications = await response.json();
+      if (applications.length === 0) {
+        applicationsList.innerHTML = '<div class="text-center p-8 text-gray-500">目前没有待处理的申请。</div>';
+      } else {
+        applicationsList.innerHTML = applications.map(app => `
+          <div class="py-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="font-medium text-gray-800">
+                  ${app.type === 'quiz' ? '答题申请' : '比赛申请'}
+                  <span class="ml-2 text-sm text-gray-500">ID: ${app.id}</span>
+                </p>
+                <p class="text-sm text-gray-600">状态: ${app.status}</p>
+              </div>
+            </div>
+            <div class="mt-2 text-sm text-gray-500">
+              <p>名称: ${app.name}</p>
+              ${app.email ? `<p>邮箱: ${app.email}</p>` : ''}
+              ${app.members ? `<p>队员: ${app.members.join(', ')}</p>` : ''}
+              ${app.competitionDetails ? `<p>比赛详情: ${app.competitionDetails}</p>` : ''}
+              ${app.answers ? `<p>答案: ${app.answers}</p>` : ''}
+            </div>
+          </div>
+        `).join('');
+      }
+    } catch (err) {
+      applicationsList.innerHTML = `<div class="text-center p-8 text-red-500">错误: ${err.message}</div>`;
+    }
+  }
+
+  // 页面加载时的初始化
+  document.addEventListener('DOMContentLoaded', () => {
+    // 反调试功能：检测开发者工具是否打开
+    const checkDevTools = () => {
+      const isDevToolsOpen = window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100;
+      if (isDevToolsOpen) {
+        showToast('警告: 检测到开发者工具已打开！');
+        (function() { debugger; })();
+      }
+    };
+    setInterval(checkDevTools, 500);
+
+    // 禁用 F12, Ctrl+Shift+I 和右键菜单，并增加 Ctrl+Shift+L
+    document.addEventListener('keydown', (e) => {
+      // 禁用 F12
+      if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault();
+        showToast('F12 已被禁用。');
+      }
+      // 禁用 Ctrl+Shift+I
+      if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+        e.preventDefault();
+        showToast('Ctrl+Shift+I 已被禁用。');
+      }
+      // Ctrl+Shift+L 进入管理员登录
+      if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+        e.preventDefault();
+        navigateTo('admin-login-form');
+        showToast('进入管理员登录页面。');
+      }
+    });
+
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showToast('右键菜单已禁用。');
+    });
+
+    // 检查是否有sessionKey
+    const sessionKey = localStorage.getItem('sessionKey');
+    if (sessionKey) {
+      isAdminAuthenticated = true;
+      document.getElementById('nav-admin').classList.remove('hidden');
+    }
+  });
+
+</script>
+
+</body>
+</html>
