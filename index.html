@@ -31,748 +31,526 @@
       background: #ffffff;
       border-radius: 1.5rem;
       padding: 2.5rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 0 40px rgba(168, 192, 255, 0.5);
       width: 100%;
-      max-width: 20rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      position: relative; /* 为伪元素定位提供基准 */
-      overflow: hidden; /* 隐藏超出边界的伪元素 */
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    
-    /* 伪元素用于创建渐变发光边框效果 */
-    .feature-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border-radius: 1.5rem;
-        background: linear-gradient(45deg, #ff7e5f, #feb47b, #86a8e7, #5345b5);
-        opacity: 0;
-        transform: scale(0.98);
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        z-index: -1; /* 确保伪元素在卡片主体后面 */
-    }
-
     .feature-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2), 0 0 50px rgba(168, 192, 255, 0.7);
     }
-    
-    .feature-card:hover::before {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    .feature-card-icon {
-      width: 4rem;
-      height: 4rem;
-      margin-bottom: 1.5rem;
-      color: #5345b5;
-      transition: color 0.3s ease;
-    }
-    .feature-card-icon svg {
-        transition: transform 0.3s ease;
-    }
-    .feature-card:hover .feature-card-icon svg {
-        transform: scale(1.1) rotate(5deg);
-    }
-    .feature-card-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #1f2937;
-    }
-    .feature-card-description {
-      font-size: 1rem;
-      color: #6b7280;
-      margin-top: 0.5rem;
-    }
-    /* 按钮样式 - 采用渐变背景 */
-    .enter-btn {
-      margin-top: 1.5rem;
-      padding: 0.75rem 2.5rem;
-      border-radius: 9999px;
-      font-weight: 600;
-      color: #ffffff;
-      background-image: linear-gradient(45deg, #a8c0ff 0%, #3f2b96 100%);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    .enter-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    }
-    /* 模态窗口样式 - 保持简洁 */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(8px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-    .modal-overlay.visible {
-      opacity: 1;
-      visibility: visible;
-    }
-    .modal-content {
-      background-color: #ffffff;
-      border-radius: 1.5rem;
-      padding: 3rem;
-      width: 95%;
-      max-width: 60rem;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    .btn {
+      transition: all 0.3s ease;
       position: relative;
-      transform: scale(0.95);
-      transition: transform 0.3s ease;
-      max-height: 90vh;
-      overflow-y: auto;
+      overflow: hidden;
     }
-    .modal-overlay.visible .modal-content {
-      transform: scale(1);
-    }
-    .modal-close-btn {
+    .btn::after {
+      content: '';
       position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      background: none;
-      border: none;
-      font-size: 2rem;
-      color: #6b7280;
-      transition: color 0.3s ease;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%);
+      transform-origin: 50% 50%;
     }
-    .modal-close-btn:hover {
-      color: #1f2937;
+    .btn:hover::after {
+      animation: pulse 1s;
     }
-    /* 表单样式 */
-    .form-input, .form-textarea, .form-select {
-      width: 100%;
-      padding: 0.75rem;
-      border-radius: 0.5rem;
-      border: 1px solid #d1d5db;
-      background-color: #f9fafb;
-      transition: all 0.2s ease;
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
-    .form-input:focus, .form-textarea:focus, .form-select:focus {
-      outline: none;
-      border-color: #5345b5;
-      box-shadow: 0 0 0 3px rgba(83, 69, 181, 0.5);
+    @keyframes pulse {
+      0% { transform: scale(0.1, 0.1) translate(-50%, -50%); opacity: 0; }
+      50% { transform: scale(5, 5) translate(-50%, -50%); opacity: 1; }
+      100% { transform: scale(10, 10) translate(-50%, -50%); opacity: 0; }
     }
-    .submit-btn {
-      background-image: linear-gradient(45deg, #a8c0ff 0%, #3f2b96 100%);
-      color: #ffffff;
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.75rem;
-      font-weight: 600;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .submit-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    /* Toast 通知 */
     .toast {
       position: fixed;
-      top: 1.5rem;
-      right: 1.5rem;
-      padding: 1rem;
-      border-radius: 0.75rem;
-      background-color: #3f2b96;
-      color: #ffffff;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-      transform: translateY(-20px);
-      z-index: 60;
+      top: 1rem;
+      right: 1rem;
+      z-index: 50;
+      animation: fadeIn 0.5s, fadeOut 0.5s 2.5s forwards;
     }
-    .toast.visible {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    /* 表格样式 */
-    .admin-table {
-      width: 100%;
-      border-collapse: collapse;
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-20px); }
     }
-    .admin-table th, .admin-table td {
-      padding: 1rem;
-      text-align: left;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    .admin-table th {
-      background-color: #f3f4f6;
-      font-weight: 600;
-      color: #374151;
-    }
-    .admin-table tbody tr:last-child td {
-      border-bottom: none;
-    }
+    /* 新增的审核状态颜色 */
+    .status-pending { color: #f97316; }
+    .status-approved { color: #10b981; }
+    .status-rejected { color: #ef4444; }
   </style>
 </head>
 <body class="bg-gray-100">
-
   <div class="main-container">
     <div class="main-content">
-      <header class="text-center mb-12">
-        <h1 class="text-5xl font-extrabold text-white leading-tight drop-shadow-lg">公开赛审核平台</h1>
-        <p class="text-indigo-200 mt-4 text-xl">提交你的题目，让更多人挑战</p>
-      </header>
+      <h1 class="text-4xl md:text-5xl font-bold text-white drop-shadow-lg text-center mb-6">公开赛审核平台</h1>
+      
+      <!-- 提交题目申请卡片 -->
+      <div id="problem-application-card" class="feature-card">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">题目申请</h2>
+        <form id="submit-form" class="space-y-6">
+          <div>
+            <label for="problem-title" class="block text-sm font-medium text-gray-700">题目名称</label>
+            <input type="text" id="problem-title" name="problemTitle" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out p-2">
+          </div>
+          <div>
+            <label for="difficulty" class="block text-sm font-medium text-gray-700">难度</label>
+            <select id="difficulty" name="difficulty" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out p-2">
+              <option value="简单">简单</option>
+              <option value="中等">中等</option>
+              <option value="困难">困难</option>
+            </select>
+          </div>
+          <div>
+            <label for="problem-file" class="block text-sm font-medium text-gray-700">题目文件 (.md)</label>
+            <input type="file" id="problem-file" name="problemFile" accept=".md" required class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+          </div>
+          <div>
+            <label for="attachments" class="block text-sm font-medium text-gray-700">附件文件 (.zip)</label>
+            <input type="file" id="attachments" name="attachments" accept=".zip" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+          </div>
+          <div class="flex items-center">
+            <input type="checkbox" id="public-consent" required class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+            <label for="public-consent" class="ml-2 block text-sm text-gray-900">我已阅读并同意 <a href="#" class="text-indigo-600 hover:text-indigo-800">平台条款</a></label>
+          </div>
+          <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 btn">
+            提交申请
+          </button>
+        </form>
+        <div id="application-status" class="mt-4 text-center text-sm"></div>
+      </div>
 
-      <!-- 功能选择卡片区域 -->
-      <div class="flex flex-col md:flex-row flex-wrap justify-center gap-8 w-full">
-        <!-- 题目提交卡片 -->
-        <div id="card-submit" class="feature-card">
-          <svg class="feature-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-          <h2 class="feature-card-title">题目提交</h2>
-          <p class="feature-card-description">提交你原创的题目，等待审核。</p>
-          <button class="enter-btn" onclick="showModal('problem-submission-form')">进入</button>
+      <!-- 公开赛申请卡片 -->
+      <div id="competition-application-card" class="feature-card">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">公开赛申请</h2>
+        <form id="competition-submit-form" class="space-y-6">
+          <div>
+            <label for="competition-oj-nickname" class="block text-sm font-medium text-gray-700">负责人OJ昵称</label>
+            <input type="text" id="competition-oj-nickname" name="ojNickname" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out p-2">
+          </div>
+          <div>
+            <label for="competition-email" class="block text-sm font-medium text-gray-700">负责人邮箱</label>
+            <input type="email" id="competition-email" name="email" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" title="请输入有效的邮箱地址" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out p-2">
+          </div>
+          <div>
+            <label for="competition-problem-ids" class="block text-sm font-medium text-gray-700">相关题目ID (多个ID用逗号分隔)</label>
+            <textarea id="competition-problem-ids" name="problemIds" rows="4" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out p-2"></textarea>
+          </div>
+          <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 btn">
+            提交公开赛申请
+          </button>
+        </form>
+        <div id="competition-application-status" class="mt-4 text-center text-sm"></div>
+      </div>
+
+      <!-- 管理员登录卡片 -->
+      <div id="admin-login-card" class="feature-card hidden">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">管理员登录</h2>
+        <form id="admin-login-form" class="space-y-6">
+          <div>
+            <label for="admin-password" class="block text-sm font-medium text-gray-700">密码</label>
+            <input type="password" id="admin-password" name="password" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition duration-150 ease-in-out p-2">
+          </div>
+          <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 btn">
+            登录
+          </button>
+        </form>
+      </div>
+
+      <!-- 管理员面板卡片 -->
+      <div id="admin-panel-card" class="feature-card hidden">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">管理员面板</h2>
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-medium text-gray-700">题目审核列表</h3>
+          <button id="admin-logout-btn" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 btn">
+            退出登录
+          </button>
+        </div>
+        
+        <div id="application-list" class="space-y-4">
+          <!-- 题目审核列表将在此处动态生成 -->
         </div>
 
-        <!-- 状态查询卡片 -->
-        <div id="card-status" class="feature-card">
-          <svg class="feature-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-8.08"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-          <h2 class="feature-card-title">状态查询</h2>
-          <p class="feature-card-description">查询已提交题目的审核进度。</p>
-          <button class="enter-btn" onclick="showModal('status-query-form')">进入</button>
-        </div>
-
-        <!-- 管理员面板卡片 (默认隐藏) -->
-        <div id="card-admin-panel" class="feature-card" style="display: none;">
-          <svg class="feature-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
-          <h2 class="feature-card-title">管理员面板</h2>
-          <p class="feature-card-description">管理和审核所有题目申请。</p>
-          <button class="enter-btn" onclick="showAdminPanel()">进入</button>
+        <h3 class="text-lg font-medium text-gray-700 mt-8 mb-4">公开赛审核列表</h3>
+        <div id="competition-application-list" class="space-y-4">
+          <!-- 公开赛审核列表将在此处动态生成 -->
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 模态窗口容器 -->
-  <div id="main-modal" class="modal-overlay">
-    <div class="modal-content">
-      <button class="modal-close-btn" onclick="closeModal()">&times;</button>
-      <div id="modal-body">
-        <!-- 动态内容将加载到此处 -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast 通知容器 -->
-  <div id="toast" class="toast"></div>
+  <!-- 提示信息容器 -->
+  <div id="toast-container" class="space-y-2"></div>
 
   <script>
-    // 定义后端 API URL
-    const WORKER_URL = 'https://hackerapi.mr-onion-blog.fun';
-    
-    /**
-     * 封装的后端 API 调用函数，处理请求头和错误
-     * @param {string} endpoint - API 路径
-     * @param {object} options - Fetch API 的选项
-     * @returns {Promise<object>} - API 响应的 JSON 数据
-     */
-    const callBackendApi = async (endpoint, options = {}) => {
-        const defaultHeaders = {
-            'Content-Type': 'application/json'
+    // 基础配置
+    const API_BASE_URL = window.location.origin;
+
+    // ----- UI 辅助函数 -----
+    const showToast = (message, isError = false) => {
+      const toastContainer = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast px-6 py-3 rounded-lg shadow-xl text-white font-medium ${isError ? 'bg-red-500' : 'bg-green-500'}`;
+      toast.textContent = message;
+      toastContainer.appendChild(toast);
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    };
+
+    const hideAllCards = () => {
+      document.getElementById('problem-application-card').classList.add('hidden');
+      document.getElementById('competition-application-card').classList.add('hidden');
+      document.getElementById('admin-login-card').classList.add('hidden');
+      document.getElementById('admin-panel-card').classList.add('hidden');
+    };
+
+    const showAdminPanelCard = () => {
+      hideAllCards();
+      document.getElementById('admin-panel-card').classList.remove('hidden');
+      fetchAndDisplayApplications();
+      fetchAndDisplayCompetitionApplications();
+    };
+
+    const hideAdminPanelCard = () => {
+      hideAllCards();
+      document.getElementById('problem-application-card').classList.remove('hidden');
+      document.getElementById('competition-application-card').classList.remove('hidden');
+      document.getElementById('admin-login-card').classList.remove('hidden');
+    };
+
+    const checkAdminStatusOnLoad = () => {
+      const token = localStorage.getItem('adminToken');
+      if (token) {
+        // 简单校验令牌是否有效
+        fetch(`${API_BASE_URL}/api/applications`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        }).then(response => {
+            if (response.ok) {
+                showAdminPanelCard();
+                showToast('已自动登录管理员面板。');
+            } else {
+                localStorage.removeItem('adminToken');
+                hideAdminPanelCard();
+                showToast('会话过期，请重新登录。');
+            }
+        }).catch(() => {
+            localStorage.removeItem('adminToken');
+            hideAdminPanelCard();
+            showToast('会话过期，请重新登录。');
+        });
+      }
+    };
+
+    // ----- 题目申请功能 -----
+    document.getElementById('submit-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+      
+      const applicationData = {
+        problemTitle: formData.get('problemTitle'),
+        difficulty: formData.get('difficulty'),
+        problemFile: null,
+        attachments: null
+      };
+
+      const problemFile = formData.get('problemFile');
+      if (problemFile) {
+        applicationData.problemFile = await problemFile.text();
+      }
+
+      const attachments = formData.get('attachments');
+      if (attachments && attachments.size > 0) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            applicationData.attachments = e.target.result.split(',')[1];
+            await sendProblemApplication(applicationData);
         };
-        // 如果存在管理员 token，则添加到请求头中
-        const adminToken = localStorage.getItem('adminToken');
-        if (adminToken) {
-            defaultHeaders['Authorization'] = `Bearer ${adminToken}`;
-        }
-        const headers = { ...defaultHeaders, ...options.headers };
+        reader.readAsDataURL(attachments);
+      } else {
+        await sendProblemApplication(applicationData);
+      }
+    });
+
+    const sendProblemApplication = async (data) => {
         try {
-          const response = await fetch(`${WORKER_URL}${endpoint}`, {
-              ...options,
-              headers,
-          });
+            const response = await fetch(`${API_BASE_URL}/api/apply`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
 
-          // 如果响应不成功，尝试将其作为文本处理
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API call failed with status:', response.status, 'Error:', errorText);
-
-            // 如果是 401 Unauthorized 错误，清除本地存储的token并强制重新登录
-            if (response.status === 401) {
-              localStorage.removeItem('adminToken');
-              hideAdminPanelCard();
-              showToast('会话过期，请重新登录。');
-              // 这里返回一个明确的失败对象，让调用者可以处理
-              return { success: false, message: '会话过期，请重新登录。' };
+            const result = await response.json();
+            if (response.ok) {
+                document.getElementById('application-status').innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                      <strong class="font-bold">申请成功!</strong>
+                      <span class="block sm:inline">您的申请ID是: <span class="font-mono">${result.id}</span>。</span>
+                    </div>
+                `;
+                showToast('题目申请提交成功！');
+                document.getElementById('submit-form').reset();
+            } else {
+                showToast(`申请失败: ${result.error || '未知错误'}`, true);
             }
-
-            return { success: false, message: errorText || `API call failed with status: ${response.status}` };
-          }
-          
-          // 检查 Content-Type，确保我们只在是JSON时才调用 .json()
-          const contentType = response.headers.get('content-type');
-          if (contentType && contentType.indexOf('application/json') !== -1) {
-            const data = await response.json();
-            // 根据后端返回的数据结构，返回一个统一的对象
-            if (data.token) {
-              return { success: true, token: data.token };
-            }
-            if (data.id) {
-              return { success: true, id: data.id };
-            }
-            // 检查是否是单个申请对象，或者是一个数组（管理员面板）
-            if (Array.isArray(data)) {
-              return { success: true, data: data };
-            }
-            // 假设单个申请对象也包含 status 字段
-            if (data.status) {
-              return { success: true, data: data };
-            }
-            // 处理 token 验证成功的响应
-            if (data.message === 'Token is valid') {
-              return { success: true, message: data.message };
-            }
-            return { success: true, message: '请求成功，但返回数据结构未知。' };
-
-          } else {
-            // 处理非 JSON 的成功响应（例如纯文本消息）
-            const textData = await response.text();
-            return { success: true, message: textData };
-          }
-
         } catch (error) {
-          // 捕获网络错误，并返回一个失败响应
-          console.error('API call failed:', error);
-          return { success: false, message: '网络请求失败，请稍后重试' };
+            console.error('提交失败:', error);
+            showToast('提交失败，请检查网络或稍后重试。', true);
         }
     };
 
-    // ======================================
-    // UI 控制和事件处理
-    // ======================================
-    const modal = document.getElementById('main-modal');
-    const modalBody = document.getElementById('modal-body');
-    const toast = document.getElementById('toast');
-    let currentView = null; // 用于跟踪当前模态窗口中显示的视图
-    
-    // 显示模态窗口
-    function showModal(viewId) {
-      modal.classList.add('visible');
-      renderView(viewId);
-    }
+    // ----- 公开赛申请功能 -----
+    document.getElementById('competition-submit-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        const ojNickname = formData.get('ojNickname');
+        const email = formData.get('email');
+        const problemIds = formData.get('problemIds').split(',').map(id => id.trim()).filter(id => id);
 
-    // 关闭模态窗口
-    function closeModal() {
-      modal.classList.remove('visible');
-      modalBody.innerHTML = '';
-      currentView = null;
-    }
-    
-    // 渲染指定视图
-    function renderView(viewId) {
-      modalBody.innerHTML = ''; // 清空内容
-      currentView = viewId;
-      switch (viewId) {
-        case 'problem-submission-form':
-          modalBody.innerHTML = generateProblemSubmissionForm();
-          setupProblemSubmissionForm();
-          break;
-        case 'status-query-form':
-          modalBody.innerHTML = generateStatusQueryForm();
-          setupStatusQueryForm();
-          break;
-        case 'admin-login-form':
-          modalBody.innerHTML = generateAdminLoginForm();
-          setupAdminLoginForm();
-          break;
-        case 'admin-panel':
-          modalBody.innerHTML = generateAdminPanelUI();
-          setupAdminPanel();
-          break;
-        default:
-          modalBody.innerHTML = `<p class="text-center text-gray-500">视图不存在</p>`;
-          break;
-      }
-    }
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/competition/apply`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ojNickname, email, problemIds })
+            });
 
-    // 显示 Toast 消息
-    function showToast(message) {
-      toast.textContent = message;
-      toast.classList.add('visible');
-      setTimeout(() => {
-        toast.classList.remove('visible');
-      }, 3000);
-    }
-
-    // 显示管理员面板卡片
-    function showAdminPanelCard() {
-      const adminPanelCard = document.getElementById('card-admin-panel');
-      if (adminPanelCard) {
-        adminPanelCard.style.display = 'flex';
-      }
-    }
-
-    // 隐藏管理员面板卡片
-    function hideAdminPanelCard() {
-      const adminPanelCard = document.getElementById('card-admin-panel');
-      if (adminPanelCard) {
-        adminPanelCard.style.display = 'none';
-      }
-    }
-    
-    // 管理员面板的入口函数
-    function showAdminPanel() {
-      const adminToken = localStorage.getItem('adminToken');
-      if (!adminToken) {
-        showToast('请先登录管理员账户');
-        showModal('admin-login-form');
-        return;
-      }
-      
-      showModal('admin-panel');
-    }
-
-    // 页面加载时检查管理员登录状态 (改进)
-    async function checkAdminStatusOnLoad() {
-      const adminToken = localStorage.getItem('adminToken');
-      if (adminToken) {
-        // 增加一个 API 调用来验证 token 是否有效
-        const result = await callBackendApi('/api/admin/verify-token');
-        if (result.success) {
-          showAdminPanelCard();
-        } else {
-          // Token 无效，清除本地存储并隐藏管理员卡片
-          localStorage.removeItem('adminToken');
-          hideAdminPanelCard();
-          showToast('管理员会话已过期，请重新登录。');
+            const result = await response.json();
+            if (response.ok) {
+                document.getElementById('competition-application-status').innerHTML = `
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                      <strong class="font-bold">申请成功!</strong>
+                      <span class="block sm:inline">您的公开赛申请ID是: <span class="font-mono">${result.id}</span>。</span>
+                    </div>
+                `;
+                showToast('公开赛申请提交成功！');
+                document.getElementById('competition-submit-form').reset();
+            } else {
+                showToast(`申请失败: ${result.error || '未知错误'}`, true);
+            }
+        } catch (error) {
+            console.error('公开赛申请提交失败:', error);
+            showToast('公开赛申请提交失败，请检查网络或稍后重试。', true);
         }
-      }
-    }
-
-    // ======================================
-    // 快捷键事件监听
-    // ======================================
-    document.addEventListener('keydown', (e) => {
-      // 禁用 F12
-      if (e.key === 'F12' || e.keyCode === 123) {
-        e.preventDefault();
-        showToast('F12 已被禁用。');
-      }
-      // 禁用 Ctrl+Shift+I
-      if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) {
-        e.preventDefault();
-        showToast('Ctrl+Shift+I 已被禁用。');
-      }
-      // 启用 Ctrl+Shift+L 进入管理员登录
-      if (e.ctrlKey && e.shiftKey && (e.key === 'L' || e.key === 'l')) {
-        e.preventDefault();
-        showToast('已启用管理员登录快捷键');
-        showModal('admin-login-form');
-      }
-      // 禁用右键菜单
-      document.addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-      });
     });
     
-    // ======================================
-    // HTML 生成函数
-    // ======================================
-    function generateProblemSubmissionForm() {
-      return `
-        <h2 class="text-3xl font-bold mb-6 text-gray-800">题目提交</h2>
-        <form id="problem-submission-form" class="space-y-4">
-          <div><label class="block text-sm font-medium text-gray-700">OJ昵称</label><input type="text" name="ojNickname" class="form-input mt-1" required></div>
-          <div><label class="block text-sm font-medium text-gray-700">UID</label><input type="text" name="uid" class="form-input mt-1" required></div>
-          <div><label class="block text-sm font-medium text-gray-700">邮箱</label><input type="email" name="email" class="form-input mt-1" required><p id="email-error" class="mt-1 text-sm text-red-500 hidden">请输入正确的邮箱格式。</p></div>
-          <div><label class="block text-sm font-medium text-gray-700">获奖经历 (可选)</label><textarea name="awards" rows="3" class="form-textarea mt-1"></textarea></div>
-          <div><label class="block text-sm font-medium text-gray-700">题目标题</label><input type="text" name="problemTitle" class="form-input mt-1" required></div>
-          <div><label class="block text-sm font-medium text-gray-700">难度</label><select name="difficulty" class="form-select mt-1" required>
-            <option value="">请选择难度...</option><option value="入门">入门</option><option value="普及-">普及-</option><option value="普及/提高-">普及/提高-</option><option value="普及+/提高">普及+/提高</option><option value="提高+/省选">提高+/省选</option><option value="省选/NOI-">省选/NOI-</option><option value="NOI/NOI+/CTSC">NOI/NOI+/CTSC</option>
-          </select></div>
-          <div><label class="block text-sm font-medium text-gray-700">题目描述 (Markdown)</label><textarea name="problemDescription" rows="6" class="form-textarea mt-1" required></textarea></div>
-          <div><label class="block text-sm font-medium text-gray-700">题目文件 (.zip, 不超过10KB)</label><input type="file" name="problemFile" accept=".zip" class="mt-1 block w-full text-gray-700" required>
-            <p id="file-error" class="mt-1 text-sm text-red-500 hidden">文件大小不能超过10KB。</p>
-          </div>
-          <button type="submit" class="w-full submit-btn">提交题目</button>
-        </form>
-      `;
-    }
-
-    function generateStatusQueryForm() {
-      return `
-        <h2 class="text-3xl font-bold mb-6 text-gray-800">状态查询</h2>
-        <form id="status-query-form" class="space-y-4">
-          <div><label class="block text-sm font-medium text-gray-700">申请ID</label><input type="text" name="queryId" class="form-input mt-1" required></div>
-          <button type="submit" class="w-full submit-btn bg-green-600 hover:bg-green-700">查询状态</button>
-        </form>
-        <div id="status-result" class="mt-6 p-4 border rounded-lg bg-gray-50 hidden"></div>
-      `;
-    }
-
-    function generateAdminLoginForm() {
-      return `
-        <h2 class="text-3xl font-bold mb-6 text-gray-800">管理员登录</h2>
-        <form id="admin-login-form" class="space-y-4">
-          <div><label class="block text-sm font-medium text-gray-700">密码</label><input type="password" name="password" class="form-input mt-1" required></div>
-          <button type="submit" class="w-full submit-btn bg-purple-600 hover:bg-purple-700">登录</button>
-        </form>
-      `;
-    }
-
-    function generateAdminPanelUI() {
-        return `
-            <h2 class="text-3xl font-bold mb-6 text-gray-800">管理员面板</h2>
-            <div id="admin-applications-list" class="w-full">
-                <!-- 申请列表将动态加载到这里 -->
-                <p class="text-center text-gray-500">加载中...</p>
-            </div>
-        `;
-    }
-
-    function generateReasonModal(action, id) {
-        const actionText = action === 'approve' ? '通过' : '拒绝';
-        const placeholderText = action === 'approve' ? '请填写通过的理由或建议...' : '请填写拒绝的理由和建议...';
-        return `
-            <h2 class="text-3xl font-bold mb-6 text-gray-800">${actionText}申请</h2>
-            <p class="text-gray-600 mb-4">申请ID: ${id}</p>
-            <form id="reason-form">
-                <div>
-                    <label for="reason-textarea" class="block text-sm font-medium text-gray-700 mb-2">理由/建议</label>
-                    <textarea id="reason-textarea" rows="6" class="form-textarea" placeholder="${placeholderText}" required></textarea>
-                </div>
-                <div class="flex justify-end gap-4 mt-6">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-lg text-gray-600 bg-gray-200 hover:bg-gray-300 transition-colors">取消</button>
-                    <button type="submit" class="px-4 py-2 rounded-lg text-white ${action === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} transition-colors">确认${actionText}</button>
-                </div>
-            </form>
-        `;
-    }
-    
-    // ======================================
-    // 视图初始化和事件绑定
-    // ======================================
-    function setupProblemSubmissionForm() {
-      const form = document.getElementById('problem-submission-form');
-      const emailInput = form.querySelector('[name="email"]');
-      const emailError = document.getElementById('email-error');
-      const fileInput = form.querySelector('[name="problemFile"]');
-      const fileError = document.getElementById('file-error');
-      const FILE_SIZE_LIMIT = 10 * 1024; // 10KB
-      const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      emailInput.addEventListener('input', () => {
-        if (!EMAIL_REGEX.test(emailInput.value)) {
-          emailError.classList.remove('hidden');
-        } else {
-          emailError.classList.add('hidden');
-        }
-      });
-      
-      fileInput.addEventListener('change', () => {
-        if (fileInput.files.length > 0 && fileInput.files[0].size > FILE_SIZE_LIMIT) {
-          fileError.classList.remove('hidden');
-        } else {
-          fileError.classList.add('hidden');
-        }
-      });
-
-      form.addEventListener('submit', async (e) => {
+    // ----- 管理员登录功能 -----
+    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (emailError.classList.contains('hidden') && fileError.classList.contains('hidden')) {
-          const formData = new FormData(form);
-          const data = Object.fromEntries(formData.entries());
-          
-          // 处理文件，将其转换为Base64
-          if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            reader.onload = async (event) => {
-              data.problemFile = event.target.result; // Base64字符串
-              // 提交数据
-              const result = await callBackendApi('/api/submit', { method: 'POST', body: JSON.stringify(data) });
-              if (result.success) {
-                showToast(`提交成功！申请ID: ${result.id}`);
-                closeModal();
-              } else {
-                showToast(result.message || '提交失败');
-              }
-            };
-            reader.readAsDataURL(file);
-          } else {
-            showToast('请上传题目文件');
-          }
-        }
-      });
-    }
-
-    function setupStatusQueryForm() {
-      const form = document.getElementById('status-query-form');
-      const statusResultDiv = document.getElementById('status-result');
-      
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const queryId = e.target.querySelector('[name="queryId"]').value;
-        const result = await callBackendApi(`/api/status/${queryId}`);
-
-        statusResultDiv.classList.remove('hidden');
-        if (result.success) {
-          const app = result.data;
-          let reasonHtml = '';
-          if (app.status !== '待审核' && app.reviewReason) {
-            reasonHtml = `<p class="mt-2 text-sm text-gray-500">审核理由: ${app.reviewReason}</p>`;
-          }
-
-          statusResultDiv.innerHTML = `
-            <p class="font-semibold text-lg text-gray-700">状态: <span class="font-bold text-blue-600">${app.status}</span></p>
-            <p class="mt-2 text-sm text-gray-500">OJ昵称: ${app.ojNickname}</p>
-            <p class="mt-1 text-sm text-gray-500">题目标题: ${app.problemTitle}</p>
-            <p class="mt-1 text-sm text-gray-500">难度: ${app.difficulty}</p>
-            ${reasonHtml}
-          `;
-          showToast('查询成功！');
-        } else {
-          statusResultDiv.innerHTML = `
-            <p class="text-center text-red-500">查询失败: ${result.message || '找不到该申请ID'}</p>
-          `;
-          showToast('查询失败。');
-        }
-      });
-    }
-
-    function setupAdminLoginForm() {
-      const form = document.getElementById('admin-login-form');
-      
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const password = e.target.querySelector('[name="password"]').value;
-        const result = await callBackendApi('/api/admin/login', { method: 'POST', body: JSON.stringify({ password }) });
-        
-        if (result.success) {
-          localStorage.setItem('adminToken', result.token); // 登录成功后保存token到本地存储
-          showToast('管理员登录成功！');
-          showAdminPanelCard();
-          closeModal();
-        } else {
-          showToast('登录失败: ' + (result.message || '密码错误'));
-        }
-      });
-    }
-
-    async function setupAdminPanel() {
-      const applicationsListDiv = document.getElementById('admin-applications-list');
-      applicationsListDiv.innerHTML = '<p class="text-center text-gray-500">加载中...</p>';
-      
-      const result = await callBackendApi('/api/admin/applications');
-
-      if (result.success && Array.isArray(result.data)) {
-        if (result.data.length === 0) {
-            applicationsListDiv.innerHTML = '<p class="text-center text-gray-500">目前没有待处理的申请。</p>';
-        } else {
-            let tableHtml = `
-              <table class="admin-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>IP地址</th>
-                    <th>OJ昵称</th>
-                    <th>题目标题</th>
-                    <th>难度</th>
-                    <th>状态</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-            `;
-            result.data.forEach(app => {
-                tableHtml += `
-                  <tr data-id="${app.id}">
-                    <td><span title="${app.id}">${app.id.slice(0, 8)}...</span></td>
-                    <td>${app.ipAddress || '未知'}</td>
-                    <td>${app.ojNickname}</td>
-                    <td>${app.problemTitle}</td>
-                    <td>${app.difficulty}</td>
-                    <td>${app.status}</td>
-                    <td>
-                      <div class="flex gap-2 flex-wrap">
-                        <button onclick="showActionReasonModal('${app.id}', 'approve')" class="approve-btn text-white bg-green-500 hover:bg-green-600 px-3 py-1 rounded-full text-sm">通过</button>
-                        <button onclick="showActionReasonModal('${app.id}', 'reject')" class="reject-btn text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-full text-sm">拒绝</button>
-                        <button onclick="downloadFile(this, 'description')" class="download-desc-btn text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-full text-sm">下载描述</button>
-                        <button onclick="downloadFile(this, 'file')" class="download-file-btn text-white bg-indigo-500 hover:bg-indigo-600 px-3 py-1 rounded-full text-sm">下载文件</button>
-                      </div>
-                    </td>
-                  </tr>
-                `;
+        const password = document.getElementById('admin-password').value;
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/admin/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
             });
-            tableHtml += `</tbody></table>`;
-            applicationsListDiv.innerHTML = tableHtml;
+            const result = await response.json();
+            if (response.ok) {
+                localStorage.setItem('adminToken', result.token);
+                showToast('登录成功！');
+                showAdminPanelCard();
+            } else {
+                showToast(result.error || '密码错误', true);
+            }
+        } catch (error) {
+            console.error('登录失败:', error);
+            showToast('登录失败，请检查网络或稍后重试。', true);
         }
-      } else {
-        applicationsListDiv.innerHTML = `<p class="text-center text-red-500">加载失败: ${result.message || '无法获取申请列表。'}</p>`;
-      }
-    }
+    });
 
-    // 显示审核理由模态窗口
-    function showActionReasonModal(id, action) {
-        modal.classList.add('visible');
-        modalBody.innerHTML = generateReasonModal(action, id);
-        
-        const form = document.getElementById('reason-form');
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const reason = document.getElementById('reason-textarea').value;
-            confirmAdminAction(id, action, reason);
-        });
-    }
+    document.getElementById('admin-logout-btn').addEventListener('click', () => {
+      localStorage.removeItem('adminToken');
+      hideAdminPanelCard();
+      showToast('已退出登录。');
+    });
 
-    // 提交审核操作
-    async function confirmAdminAction(id, action, reason) {
-        const url = `/api/admin/${action}/${id}`;
-        const result = await callBackendApi(url, { 
-            method: 'POST', 
-            body: JSON.stringify({ reason }) 
-        });
-        
-        if (result.success) {
-            showToast(`申请 ${id.slice(0, 8)}... 已${action === 'approve' ? '通过' : '拒绝'}。`);
-            closeModal();
-            // 重新渲染面板以更新状态
-            setupAdminPanel();
-        } else {
-            showToast(`操作失败: ${result.message || '请稍后重试。'}`);
-        }
-    }
-
-
-    async function downloadFile(button, fileType) {
-        const row = button.closest('tr');
-        const id = row.dataset.id;
-        const url = `/api/admin/download/${fileType}/${id}`;
+    // ----- 管理员面板 - 获取和显示题目申请列表 -----
+    const fetchAndDisplayApplications = async () => {
+        const token = localStorage.getItem('adminToken');
+        if (!token) return;
         
         try {
-            const adminToken = localStorage.getItem('adminToken');
-            if (!adminToken) {
-              showToast('请先登录管理员账户');
-              showModal('admin-login-form');
+            const response = await fetch(`${API_BASE_URL}/api/applications`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.status === 401) {
+                localStorage.removeItem('adminToken');
+                hideAdminPanelCard();
+                showToast('会话过期，请重新登录。', true);
+                return;
+            }
+            const applications = await response.json();
+            const listContainer = document.getElementById('application-list');
+            listContainer.innerHTML = ''; // 清空列表
+            if (applications.length === 0) {
+              listContainer.innerHTML = '<p class="text-center text-gray-500">暂无题目申请。</p>';
               return;
             }
-            
-            const response = await fetch(`${WORKER_URL}${url}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${adminToken}`,
-                },
+
+            applications.forEach(app => {
+                const applicationItem = document.createElement('div');
+                applicationItem.className = 'p-4 rounded-lg bg-gray-50 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3';
+                const statusClass = `status-${app.status || 'pending'}`;
+                applicationItem.innerHTML = `
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">${app.problemTitle} (<span class="font-mono text-xs">${app.id}</span>)</p>
+                        <p class="text-xs text-gray-500 mt-1">难度: ${app.difficulty} | 提交于: ${new Date(app.submittedAt).toLocaleString()}</p>
+                        <p class="text-sm font-bold mt-2 ${statusClass}">状态: ${app.status === 'approved' ? '已批准' : app.status === 'rejected' ? '已拒绝' : '待审核'}</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <button onclick="downloadFile('${app.id}', 'description')" class="py-2 px-4 rounded-md text-sm font-medium text-indigo-600 border border-indigo-600 hover:bg-indigo-50 transition btn">下载描述</button>
+                        ${app.attachments ? `<button onclick="downloadFile('${app.id}', 'attachments')" class="py-2 px-4 rounded-md text-sm font-medium text-indigo-600 border border-indigo-600 hover:bg-indigo-50 transition btn">下载附件</button>` : ''}
+                        <button onclick="changeStatus('${app.id}', 'approve')" class="py-2 px-4 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition btn ${app.status === 'approved' ? 'opacity-50 cursor-not-allowed' : ''}" ${app.status === 'approved' ? 'disabled' : ''}>批准</button>
+                        <button onclick="changeStatus('${app.id}', 'reject')" class="py-2 px-4 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition btn ${app.status === 'rejected' ? 'opacity-50 cursor-not-allowed' : ''}" ${app.status === 'rejected' ? 'disabled' : ''}>拒绝</button>
+                    </div>
+                `;
+                listContainer.appendChild(applicationItem);
             });
-            
+        } catch (error) {
+            console.error('获取申请列表失败:', error);
+            showToast('获取申请列表失败，请检查网络。', true);
+        }
+    };
+    
+    // ----- 管理员面板 - 获取和显示公开赛申请列表 -----
+    const fetchAndDisplayCompetitionApplications = async () => {
+        const token = localStorage.getItem('adminToken');
+        if (!token) return;
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/competition/applications`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.status === 401) {
+                localStorage.removeItem('adminToken');
+                hideAdminPanelCard();
+                showToast('会话过期，请重新登录。', true);
+                return;
+            }
+            const applications = await response.json();
+            const listContainer = document.getElementById('competition-application-list');
+            listContainer.innerHTML = ''; // 清空列表
+            if (applications.length === 0) {
+              listContainer.innerHTML = '<p class="text-center text-gray-500">暂无公开赛申请。</p>';
+              return;
+            }
+
+            applications.forEach(app => {
+                const applicationItem = document.createElement('div');
+                applicationItem.className = 'p-4 rounded-lg bg-gray-50 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3';
+                const statusClass = `status-${app.status || 'pending'}`;
+                applicationItem.innerHTML = `
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">${app.ojNickname} 的公开赛申请 (<span class="font-mono text-xs">${app.id}</span>)</p>
+                        <p class="text-xs text-gray-500 mt-1">邮箱: ${app.email} | 提交于: ${new Date(app.submittedAt).toLocaleString()}</p>
+                        <p class="text-xs text-gray-500 mt-1">相关题目ID: ${app.problemIds.join(', ')}</p>
+                        <p class="text-sm font-bold mt-2 ${statusClass}">状态: ${app.status === 'approved' ? '已批准' : app.status === 'rejected' ? '已拒绝' : '待审核'}</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <button onclick="downloadCompetitionFiles('${app.id}')" class="py-2 px-4 rounded-md text-sm font-medium text-indigo-600 border border-indigo-600 hover:bg-indigo-50 transition btn">下载题目描述</button>
+                        <button onclick="changeCompetitionStatus('${app.id}', 'approve')" class="py-2 px-4 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition btn ${app.status === 'approved' ? 'opacity-50 cursor-not-allowed' : ''}" ${app.status === 'approved' ? 'disabled' : ''}>批准</button>
+                        <button onclick="changeCompetitionStatus('${app.id}', 'reject')" class="py-2 px-4 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition btn ${app.status === 'rejected' ? 'opacity-50 cursor-not-allowed' : ''}" ${app.status === 'rejected' ? 'disabled' : ''}>拒绝</button>
+                    </div>
+                `;
+                listContainer.appendChild(applicationItem);
+            });
+        } catch (error) {
+            console.error('获取公开赛申请列表失败:', error);
+            showToast('获取公开赛申请列表失败，请检查网络。', true);
+        }
+    };
+
+
+    // ----- 管理员面板 - 修改题目申请状态 -----
+    window.changeStatus = async (id, newStatus) => {
+        const token = localStorage.getItem('adminToken');
+        if (!token) return;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/status/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (response.ok) {
+                showToast(`申请 ${id} 状态已更新为 ${newStatus === 'approve' ? '已批准' : '已拒绝'}。`);
+                fetchAndDisplayApplications(); // 刷新列表
+            } else if (response.status === 401) {
+              localStorage.removeItem('adminToken');
+              hideAdminPanelCard();
+              showToast('会话过期，请重新登录。');
+            } else {
+                const errorText = await response.text();
+                showToast(`更新状态失败: ${errorText}`, true);
+            }
+        } catch (error) {
+            console.error('Update status failed:', error);
+            showToast('更新状态失败，请检查网络或稍后重试。', true);
+        }
+    };
+
+    // ----- 管理员面板 - 修改公开赛申请状态 -----
+    window.changeCompetitionStatus = async (id, newStatus) => {
+        const token = localStorage.getItem('adminToken');
+        if (!token) return;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/competition/status/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (response.ok) {
+                showToast(`公开赛申请 ${id} 状态已更新为 ${newStatus === 'approve' ? '已批准' : '已拒绝'}。`);
+                fetchAndDisplayCompetitionApplications(); // 刷新列表
+            } else if (response.status === 401) {
+              localStorage.removeItem('adminToken');
+              hideAdminPanelCard();
+              showToast('会话过期，请重新登录。', true);
+            } else {
+                const errorText = await response.text();
+                showToast(`更新状态失败: ${errorText}`, true);
+            }
+        } catch (error) {
+            console.error('Update competition status failed:', error);
+            showToast('更新状态失败，请检查网络或稍后重试。', true);
+        }
+    };
+
+    // ----- 管理员面板 - 下载文件 -----
+    window.downloadFile = async (id, fileType) => {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+          showToast('请先登录。', true);
+          return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/download/${id}/${fileType}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
             if (!response.ok) {
               if (response.status === 401) {
                 localStorage.removeItem('adminToken');
@@ -781,7 +559,7 @@
                 return;
               }
               const errorText = await response.text();
-              showToast(`下载失败: ${errorText}`);
+              showToast(`下载失败: ${errorText}`, true);
               return;
             }
             
@@ -794,7 +572,7 @@
             let filename = '';
             const contentDisposition = response.headers.get('Content-Disposition');
             if (contentDisposition) {
-              const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+              const filenameMatch = contentDisposition.match(/filename=\"(.+)\"/);
               if (filenameMatch) {
                 filename = filenameMatch[1];
               }
@@ -809,14 +587,112 @@
 
         } catch (error) {
             console.error('Download failed:', error);
-            showToast('下载失败，请检查网络或稍后重试。');
+            showToast('下载失败，请检查网络或稍后重试。', true);
         }
-    }
+    };
+
+    // ----- 管理员面板 - 下载公开赛题目文件 -----
+    window.downloadCompetitionFiles = async (id) => {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+          showToast('请先登录。', true);
+          return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/competition/download/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+              if (response.status === 401) {
+                localStorage.removeItem('adminToken');
+                hideAdminPanelCard();
+                showToast('会话过期，请重新登录。');
+                return;
+              }
+              const errorText = await response.text();
+              showToast(`下载失败: ${errorText}`, true);
+              return;
+            }
+            
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = downloadUrl;
+            
+            a.download = `competition-problems-${id}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(downloadUrl);
+            document.body.removeChild(a);
+            showToast('下载成功！');
+
+        } catch (error) {
+            console.error('Download competition files failed:', error);
+            showToast('下载失败，请检查网络或稍后重试。', true);
+        }
+    };
 
     // 页面加载时执行
     window.onload = checkAdminStatusOnLoad;
+
+    // ----- 开发者工具检测和禁用 -----
+    let isDevToolsOpen = false;
+    let shouldRefreshOnDevTools = true; // 默认启用刷新功能
+
+    const checkDevTools = () => {
+      const isDevToolsOpen = window.outerWidth - window.innerWidth > 100 ||
+                             window.outerHeight - window.innerHeight > 100;
+      if (isDevToolsOpen) {
+        // 如果开发者工具已打开，并且标志为true，则反复刷新页面
+        if (shouldRefreshOnDevTools) {
+          showToast('警告: 检测到开发者工具已打开！页面将反复刷新。');
+          // 设置一个定时器来反复刷新页面
+          setInterval(() => {
+            location.reload();
+          }, 500);
+        } else {
+          showToast('警告: 检测到开发者工具已打开！');
+        }
+        // 调用 debugger 以立即暂停执行
+        (function() { debugger; })();
+      }
+    };
+    setInterval(checkDevTools, 500);
+
+    // 禁用 F12, Ctrl+Shift+I 和右键菜单，并增加 Ctrl+Shift+L
+    document.addEventListener('keydown', (e) => {
+      // 禁用 F12
+      if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault();
+        showToast('F12 已被禁用。');
+      }
+      // 禁用 Ctrl+Shift+I
+      if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+        e.preventDefault();
+        showToast('Ctrl+Shift+I 已被禁用。');
+      }
+      // Ctrl+Shift+L 进入管理员登录
+      if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+        e.preventDefault();
+        hideAllCards();
+        document.getElementById('admin-login-card').classList.remove('hidden');
+      }
+    });
+    
+    // 禁用右键菜单
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showToast('右键菜单已被禁用。');
+    });
+
   </script>
 </body>
 </html>
+
 
 
